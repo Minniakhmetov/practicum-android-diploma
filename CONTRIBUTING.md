@@ -51,7 +51,8 @@
 
 | Ресурс | Шаблон | Пример |
 |---|---|---|
-| Иконка, иллюстрация (`drawable`) | `ic_<name>_<size>` | `ic_search_24`, `ic_logo_placeholder_32`, `ic_no_internet_328x223` |
+| Иконка (`drawable`) | `ic_<name>_<size>` | `ic_search_24`, `ic_logo_placeholder_32` |
+| Картинка, иллюстрация (`drawable`) | `img_<name>_<size>` | `img_no_internet_328x223`, `img_search_start_328x223` |
 | Layout | `activity_<name>`, `fragment_<name>`, `item_<name>` | `activity_root`, `fragment_search` |
 | Строка | `<feature>_<meaning>`, общие - без префикса фичи | `search_hint`, `vacancy_salary_not_specified`, `retry` |
 | Файл строк | `strings_<feature>.xml`, общие - `strings.xml` | `strings_search.xml` |
@@ -60,7 +61,7 @@
 | Меню | `<name>_menu` | `bottom_navigation_menu` |
 | id в XML | camelCase | `searchFragment`, `bottomNavigationView` |
 
-Размер иконки - в dp из макета: для квадратной одно число (`_24`), для остальных `<ширина>x<высота>` с латинской `x` (`_328x223`).
+Размер иконки и картинки - в dp из макета: для квадратной одно число (`_24`), для остальных `<ширина>x<высота>` с латинской `x` (`_328x223`).
 
 # Оформление коммитов
 
