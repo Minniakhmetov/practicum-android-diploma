@@ -13,7 +13,7 @@
 
 | Что | Стиль | Пример |
 |---|---|---|
-| Пакет | строчные буквы, без `_` | `ru.practicum.android.diploma.domain.models` |
+| Пакет | строчные буквы, без `_` | `ru.practicum.android.diploma.search.domain.models` |
 | Класс, интерфейс, object, enum | PascalCase | `VacancyDetails`, `SearchInteractor` |
 | Composable-функция | PascalCase, существительное | `VacancyListItem`, `SearchScreen` |
 | Функция, переменная, параметр | camelCase, функция начинается с глагола | `searchVacancies()`, `vacancyId` |
@@ -42,7 +42,7 @@
 | ui | Composable экрана | `<Screen>Screen` | `FavoritesScreen` |
 | ui | Общий компонент | по смыслу, без суффикса | `VacancyListItem`, `Placeholder` |
 | ui | Preview | `<Name>Preview`, `private` | `VacancyListItemPreview` |
-| di | Koin-модуль | `<layer>Module` | `dataModule`, `viewModelModule` |
+| di | Koin-модуль | `<feature>Module`, общие - по назначению | `searchModule`, `networkModule` |
 
 Приватное изменяемое состояние во ViewModel - с подчёркиванием, публичное - без: `private val _state` / `val state`.
 
@@ -101,17 +101,11 @@
 
 ## Koin-модули
 
-Модули разделены по слоям. Свои определения добавляем блоком в конце модуля с комментарием фичи:
+У каждой фичи свой Koin-модуль в пакете `<feature>/di`: `searchModule`, `vacancyModule`, `favoritesModule`, `filterModule`, `teamModule`. Каждый правит только модуль своей фичи.
 
-```kotlin
-val repositoryModule = module {
-    // search
-    single<VacancyRepository> { VacancyRepositoryImpl(get()) }
+Общие зависимости (Retrofit, OkHttp, Room, `NetworkClient`) лежат в модулях `core/di`: `networkModule`, `databaseModule`.
 
-    // favorites
-    single<FavoritesRepository> { FavoritesRepositoryImpl(get()) }
-}
-```
+Список модулей в `startKoin` в `App.kt` заполняется целиком в Epic 0, в том числе пустыми модулями фич. Потом `App.kt` не меняем.
 
 ## Ветки
 
