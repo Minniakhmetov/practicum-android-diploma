@@ -92,8 +92,10 @@ dependencies {
     // Koin
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
-    // Paging
-    implementation(libs.bundles.paging)
     // Debug
     debugImplementation(libs.androidx.compose.ui.tooling)
+    // Testing
+    testImplementation(libs.junit4)
+    androidTestImplementation(libs.junit.ext)
+    androidTestImplementation(libs.espresso.core)
 }
