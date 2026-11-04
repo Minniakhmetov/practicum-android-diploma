@@ -2,6 +2,7 @@
 # Правила разработки
 
 - [Именование](#именование)
+- [Работа с общими файлами](#работа-с-общими-файлами)
 - [Оформление коммитов](#оформление-коммитов)
 
 # Именование
@@ -12,7 +13,7 @@
 
 | Что | Стиль | Пример |
 |---|---|---|
-| Пакет | строчные буквы, без `_` | `ru.practicum.android.diploma.domain.models` |
+| Пакет | строчные буквы, без `_` | `ru.practicum.android.diploma.search.domain.models` |
 | Класс, интерфейс, object, enum | PascalCase | `VacancyDetails`, `SearchInteractor` |
 | Composable-функция | PascalCase, существительное | `VacancyListItem`, `SearchScreen` |
 | Функция, переменная, параметр | camelCase, функция начинается с глагола | `searchVacancies()`, `vacancyId` |
@@ -41,7 +42,7 @@
 | ui | Composable экрана | `<Screen>Screen` | `FavoritesScreen` |
 | ui | Общий компонент | по смыслу, без суффикса | `VacancyListItem`, `Placeholder` |
 | ui | Preview | `<Name>Preview`, `private` | `VacancyListItemPreview` |
-| di | Koin-модуль | `<layer>Module` | `dataModule`, `viewModelModule` |
+| di | Koin-модуль | `<feature>Module`, общие - по назначению | `searchModule`, `networkModule` |
 
 Приватное изменяемое состояние во ViewModel - с подчёркиванием, публичное - без: `private val _state` / `val state`.
 
@@ -62,6 +63,56 @@
 | id в XML | camelCase | `searchFragment`, `bottomNavigationView` |
 
 Размер иконки и картинки - в dp из макета: для квадратной одно число (`_24`), для остальных `<ширина>x<высота>` с латинской `x` (`_328x223`).
+
+# Работа с общими файлами
+
+Правила для файлов, которые нужны обеим фичам. Цель - не ловить merge-конфликты в каждом PR.
+
+## Дизайн-система
+
+Цвета, типографика, размеры, иконки, иллюстрации и общие компоненты делаются целиком в Epic 0, потом дизайн-систему не расширяем.
+
+Если чего-то не хватило:
+1. Делаем отдельный маленький PR с коммитом `feat(design-system): ...`.
+2. Мёржим его первым.
+3. Второй участник сразу подтягивает `develop` в свою ветку.
+
+## Строки
+
+Строки разложены по файлам фич, каждый правит только файл своей фичи.
+
+| Файл | Что в нём |
+|---|---|
+| `values/strings.xml` | общие строки (кнопки, ошибки, плейсхолдеры, названия вкладок) |
+| `values/strings_search.xml` | поиск |
+| `values/strings_vacancy.xml` | экран вакансии |
+| `values/strings_favorites.xml` | избранное |
+| `values/strings_filter.xml` | фильтр |
+| `values/strings_team.xml` | экран команды |
+
+Если строка нужна двум фичам, она переезжает в `strings.xml` отдельным коммитом.
+
+## Размеры
+
+`Dimens.kt` пишется целиком в Epic 0. Размер, нужный только одному экрану, кладём в `private val` в файле этого экрана, а не в `Dimens.kt`.
+
+## Навигация
+
+Граф навигации описывается полностью в Epic 0: все фрагменты, переходы и аргументы. Фичи граф не меняют.
+
+## Koin-модули
+
+У каждой фичи свой Koin-модуль в пакете `<feature>/di`: `searchModule`, `vacancyModule`, `favoritesModule`, `filterModule`, `teamModule`. Каждый правит только модуль своей фичи.
+
+Общие зависимости (Retrofit, OkHttp, Room, `NetworkClient`) лежат в модулях `core/di`: `networkModule`, `databaseModule`.
+
+Список модулей в `startKoin` в `App.kt` заполняется целиком в Epic 0, в том числе пустыми модулями фич. Потом `App.kt` не меняем.
+
+## Ветки
+
+- Ветку создаём от `develop`, имя по шаблону `<type>/<номер задачи>-<кратко>`, где `type` - тип из [оформления коммитов](#типы-коммитов): `feat/48-search-request`, `docs/9-naming-conventions`.
+- PR открываем в `Minniakhmetov/practicum-android-diploma` с базой `develop` (не в репозиторий Яндекс Практикума).
+- `develop` подтягиваем в свою ветку минимум раз в день и перед каждым PR.
 
 # Оформление коммитов
 
