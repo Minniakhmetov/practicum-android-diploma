@@ -1,4 +1,4 @@
-package ru.practicum.android.diploma.ui.theme
+package ru.practicum.android.diploma.core.designsystem.theme
 
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
