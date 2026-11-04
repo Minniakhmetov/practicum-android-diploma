@@ -1,3 +1,24 @@
 <resources>
-    <string name="app_name">Practicum-Android-Diploma</string>
+    <string name="app_name">Агрегатор вакансий</string>
+
+    <!-- Нижняя навигация и заголовки экранов -->
+    <string name="main">Главная</string>
+    <string name="favorites">Избранное</string>
+    <string name="team">Команда</string>
+
+    <!-- Кнопки -->
+    <string name="choose">Выбрать</string>
+    <string name="apply">Применить</string>
+    <string name="reset">Сбросить</string>
+
+    <!-- Плейсхолдеры ошибок -->
+    <string name="no_internet">Нет интернета</string>
+    <string name="server_error">Ошибка сервера</string>
+    <string name="failed_to_get_list">Не удалось получить список</string>
+
+    <!-- Зарплата в списке вакансий, на экране вакансии и в избранном. %1$s - сумма с валютой -->
+    <string name="salary_from">От %1$s</string>
+    <string name="salary_to">До %1$s</string>
+    <string name="salary_from_to">От %1$s до %2$s</string>
+    <string name="salary_not_specified">Зарплата не указана</string>
 </resources>
