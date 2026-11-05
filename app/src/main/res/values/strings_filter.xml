@@ -21,4 +21,12 @@
     <!-- Выбор отрасли -->
     <string name="filter_industry_title">Выбор отрасли</string>
     <string name="filter_industry_hint">Введите отрасль</string>
+
+    <!-- Ошибка загрузки списка регионов и отраслей -->
+    <string name="filter_failed_to_get_list">Не удалось получить список</string>
+
+    <!-- Кнопки -->
+    <string name="filter_choose">Выбрать</string>
+    <string name="filter_apply">Применить</string>
+    <string name="filter_reset">Сбросить</string>
 </resources>

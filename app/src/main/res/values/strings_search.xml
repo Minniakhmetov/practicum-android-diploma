@@ -2,7 +2,6 @@
     <string name="search_title">Поиск вакансий</string>
     <string name="search_hint">Введите запрос</string>
     <string name="search_no_vacancies">Таких вакансий нет</string>
-    <string name="search_failed_to_get_vacancies">Не удалось получить список вакансий</string>
 
     <plurals name="search_vacancies_found">
         <item quantity="one">Найдена %d вакансия</item>
