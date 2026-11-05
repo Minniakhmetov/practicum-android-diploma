@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Палитра для XML: тема Activity, BottomNavigationView. Значения совпадают с ui/theme/Color.kt -->
+    <!-- Палитра для XML: тема Activity, BottomNavigationView. Значения совпадают с core/designsystem/theme/Color.kt -->
     <color name="black">#FF1A1B22</color>
     <color name="white">#FFFDFDFD</color>
     <color name="light_gray">#FFE6E8EB</color>
