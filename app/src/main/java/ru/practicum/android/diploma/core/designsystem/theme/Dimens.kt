@@ -60,6 +60,7 @@ object Dimens {
 
     // Лоадер
     val loaderSize = 48.dp
+    val loaderIndicatorSize = 36.dp
 
     // Иллюстрация плейсхолдера и отступ до текста под ней
     val placeholderImageWidth = 328.dp
