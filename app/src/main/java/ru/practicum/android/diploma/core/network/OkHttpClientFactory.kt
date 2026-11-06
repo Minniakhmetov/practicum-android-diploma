@@ -5,13 +5,18 @@ import okhttp3.logging.HttpLoggingInterceptor
 import ru.practicum.android.diploma.BuildConfig
 import java.util.concurrent.TimeUnit
 
+private const val CONNECT_TIMEOUT_SECONDS = 15L
+private const val WRITE_TIMEOUT_SECONDS = 15L
+private const val READ_TIMEOUT_SECONDS = 15L
+private const val CALL_TIMEOUT_SECONDS = 20L
+
 object OkHttpClientFactory {
     fun create(): OkHttpClient {
         val builder = OkHttpClient.Builder()
-            .connectTimeout(5, TimeUnit.SECONDS)
-            .writeTimeout(5, TimeUnit.SECONDS)
-            .readTimeout(5, TimeUnit.SECONDS)
-            .callTimeout(10, TimeUnit.SECONDS)
+            .connectTimeout(CONNECT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .writeTimeout(WRITE_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .readTimeout(READ_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .callTimeout(CALL_TIMEOUT_SECONDS, TimeUnit.SECONDS)
 
         builder.addInterceptor { chain ->
             val originalRequest = chain.request()
