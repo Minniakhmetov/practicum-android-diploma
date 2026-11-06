@@ -4,15 +4,17 @@ import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import ru.practicum.android.diploma.BuildConfig
 
 object RetrofitFactory {
+
+    private const val BASE_URL = "https://android-diploma.education-services.ru/"
+
     fun create(
         okHttpClient: OkHttpClient,
         gson: Gson
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(BuildConfig.BASE_URL)
+            .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(
                 GsonConverterFactory.create(gson)
