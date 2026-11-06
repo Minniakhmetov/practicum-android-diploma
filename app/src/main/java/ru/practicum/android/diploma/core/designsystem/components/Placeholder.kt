@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +19,7 @@ import ru.practicum.android.diploma.core.designsystem.theme.Dimens
 import ru.practicum.android.diploma.core.designsystem.theme.DiplomaTheme
 
 // Плейсхолдер пустых состояний и ошибок: иллюстрация 328x223 по центру, под ней текст.
+// Ширина текста ограничена 268 по макету, чтобы переносы совпадали с ним на любом экране.
 // Текста может не быть (начальный экран поиска). Содержимое центрируется в доступной области,
 // поэтому экран обычно передаёт Modifier.fillMaxSize().
 @Composable
@@ -43,7 +45,9 @@ fun Placeholder(
         if (text != null) {
             Text(
                 text = text,
-                modifier = Modifier.padding(top = Dimens.placeholderTextTopPadding),
+                modifier = Modifier
+                    .widthIn(max = Dimens.placeholderTextMaxWidth)
+                    .padding(top = Dimens.placeholderTextTopPadding),
                 style = MaterialTheme.typography.titleLarge,
                 color = DiplomaTheme.colors.primaryText,
                 textAlign = TextAlign.Center,
