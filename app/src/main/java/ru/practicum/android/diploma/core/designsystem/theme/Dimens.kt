@@ -62,10 +62,11 @@ object Dimens {
     val loaderSize = 48.dp
     val loaderIndicatorSize = 36.dp
 
-    // Иллюстрация плейсхолдера и отступ до текста под ней
+    // Иллюстрация плейсхолдера, отступ до текста под ней и максимальная ширина текста
     val placeholderImageWidth = 328.dp
     val placeholderImageHeight = 223.dp
     val placeholderTextTopPadding = spacing16
+    val placeholderTextMaxWidth = 268.dp
 
     // Размеры текста (YS Display): размер / высота строки
     val textSize32 = 32.sp
