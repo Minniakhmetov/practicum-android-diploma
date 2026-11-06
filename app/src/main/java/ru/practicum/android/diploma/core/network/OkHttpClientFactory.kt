@@ -24,6 +24,7 @@ object OkHttpClientFactory {
         if (BuildConfig.DEBUG) {
             val loggingInterceptor = HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
+                redactHeader("Authorization")
             }
             builder.addInterceptor(loggingInterceptor)
         }
