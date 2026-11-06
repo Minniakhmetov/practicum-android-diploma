@@ -83,8 +83,8 @@ fun FilterListItem(
     value: String?,
     onClick: () -> Unit,
     onClearClick: () -> Unit,
+    clearContentDescription: String,
     modifier: Modifier = Modifier,
-    clearContentDescription: String? = null,
 ) {
     ListItemContainer(modifier = modifier.clickable(onClick = onClick)) {
         if (value == null) {
@@ -156,7 +156,19 @@ private fun ListItemsPreview() {
         CheckboxListItem(text = "Не показывать без зарплаты", checked = false, onCheckedChange = {})
         RadioListItem(text = "Информационные технологии", selected = true, onClick = {})
         RadioListItem(text = "Образование", selected = false, onClick = {})
-        FilterListItem(label = "Место работы", value = null, onClick = {}, onClearClick = {})
-        FilterListItem(label = "Место работы", value = "Россия, Москва", onClick = {}, onClearClick = {})
+        FilterListItem(
+            label = "Место работы",
+            value = null,
+            onClick = {},
+            onClearClick = {},
+            clearContentDescription = "Очистить",
+        )
+        FilterListItem(
+            label = "Место работы",
+            value = "Россия, Москва",
+            onClick = {},
+            onClearClick = {},
+            clearContentDescription = "Очистить",
+        )
     }
 }

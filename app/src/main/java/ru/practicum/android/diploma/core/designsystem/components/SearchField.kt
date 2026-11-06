@@ -18,24 +18,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.core.designsystem.theme.Dimens
 import ru.practicum.android.diploma.core.designsystem.theme.DiplomaTheme
 
-// Поле поиска: пустое - иконка лупы, с текстом - крестик очистки
+// Поле поиска: пустое - иконка лупы, с текстом - крестик очистки.
+// По кнопке "Поиск" на клавиатуре и по крестику клавиатура скрывается.
 @Composable
 fun SearchField(
     query: String,
     onQueryChange: (String) -> Unit,
     onClearClick: () -> Unit,
     placeholder: String,
+    clearContentDescription: String,
     modifier: Modifier = Modifier,
-    clearContentDescription: String? = null,
     onSearch: () -> Unit = {},
 ) {
     val colors = DiplomaTheme.colors
+    val focusManager = LocalFocusManager.current
     BasicTextField(
         value = query,
         onValueChange = onQueryChange,
@@ -44,7 +47,12 @@ fun SearchField(
             .height(Dimens.searchFieldHeight),
         textStyle = MaterialTheme.typography.bodyLarge.copy(color = colors.fieldText),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        keyboardActions = KeyboardActions(onSearch = { onSearch() }),
+        keyboardActions = KeyboardActions(
+            onSearch = {
+                focusManager.clearFocus()
+                onSearch()
+            },
+        ),
         singleLine = true,
         cursorBrush = SolidColor(colors.accent),
         decorationBox = { innerTextField ->
@@ -74,7 +82,10 @@ fun SearchField(
                     AppIconButton(
                         iconRes = R.drawable.ic_close_24,
                         contentDescription = clearContentDescription,
-                        onClick = onClearClick,
+                        onClick = {
+                            focusManager.clearFocus()
+                            onClearClick()
+                        },
                         tint = colors.fieldText,
                     )
                 }
@@ -87,7 +98,19 @@ fun SearchField(
 @Composable
 private fun SearchFieldPreview() {
     ComponentPreview {
-        SearchField(query = "", onQueryChange = {}, onClearClick = {}, placeholder = "Введите запрос")
-        SearchField(query = "Android", onQueryChange = {}, onClearClick = {}, placeholder = "Введите запрос")
+        SearchField(
+            query = "",
+            onQueryChange = {},
+            onClearClick = {},
+            placeholder = "Введите запрос",
+            clearContentDescription = "Очистить",
+        )
+        SearchField(
+            query = "Android",
+            onQueryChange = {},
+            onClearClick = {},
+            placeholder = "Введите запрос",
+            clearContentDescription = "Очистить",
+        )
     }
 }

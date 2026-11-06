@@ -27,18 +27,17 @@ import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.core.designsystem.theme.Dimens
 import ru.practicum.android.diploma.core.designsystem.theme.DiplomaTheme
 
-// Поле ввода с подписью сверху ("Ожидаемая зарплата").
+// Поле ввода зарплаты с подписью сверху ("Ожидаемая зарплата"), открывает цифровую клавиатуру.
 // Подпись: в фокусе синяя, с текстом - чёрная, пустая - серая. Крестик виден в фокусе, когда есть текст.
 @Composable
-fun AppTextField(
+fun SalaryTextField(
     value: String,
     onValueChange: (String) -> Unit,
     onClearClick: () -> Unit,
     label: String,
     placeholder: String,
+    clearContentDescription: String,
     modifier: Modifier = Modifier,
-    clearContentDescription: String? = null,
-    keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 ) {
     val colors = DiplomaTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
@@ -56,7 +55,7 @@ fun AppTextField(
             .fillMaxWidth()
             .height(Dimens.textFieldHeight),
         textStyle = MaterialTheme.typography.bodyLarge.copy(color = colors.fieldText),
-        keyboardOptions = keyboardOptions,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         singleLine = true,
         interactionSource = interactionSource,
         cursorBrush = SolidColor(colors.accent),
@@ -104,21 +103,23 @@ fun AppTextField(
 
 @LightDarkPreviews
 @Composable
-private fun AppTextFieldPreview() {
+private fun SalaryTextFieldPreview() {
     ComponentPreview {
-        AppTextField(
+        SalaryTextField(
             value = "",
             onValueChange = {},
             onClearClick = {},
             label = "Ожидаемая зарплата",
             placeholder = "Введите сумму",
+            clearContentDescription = "Очистить",
         )
-        AppTextField(
+        SalaryTextField(
             value = "40000",
             onValueChange = {},
             onClearClick = {},
             label = "Ожидаемая зарплата",
             placeholder = "Введите сумму",
+            clearContentDescription = "Очистить",
         )
     }
 }

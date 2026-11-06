@@ -23,8 +23,8 @@ import ru.practicum.android.diploma.core.designsystem.theme.DiplomaTheme
 fun AppTopBar(
     title: String,
     modifier: Modifier = Modifier,
-    onBackClick: (() -> Unit)? = null,
-    backContentDescription: String? = null,
+    onBackClick: (() -> Unit)?,
+    backContentDescription: String?,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     Row(
@@ -62,10 +62,10 @@ fun AppTopBar(
 @Composable
 private fun AppTopBarPreview() {
     ComponentPreview {
-        AppTopBar(title = "Поиск вакансий") {
+        AppTopBar(title = "Поиск вакансий", onBackClick = null, backContentDescription = null) {
             AppIconButton(iconRes = R.drawable.ic_filter_off_24, contentDescription = null, onClick = {})
         }
-        AppTopBar(title = "Вакансия", onBackClick = {}) {
+        AppTopBar(title = "Вакансия", onBackClick = {}, backContentDescription = "Назад") {
             AppIconButton(iconRes = R.drawable.ic_sharing_24, contentDescription = null, onClick = {})
             AppIconButton(
                 iconRes = R.drawable.ic_favorites_on_24,
@@ -74,6 +74,6 @@ private fun AppTopBarPreview() {
                 tint = DiplomaTheme.colors.attention,
             )
         }
-        AppTopBar(title = "Избранное")
+        AppTopBar(title = "Избранное", onBackClick = null, backContentDescription = null)
     }
 }
