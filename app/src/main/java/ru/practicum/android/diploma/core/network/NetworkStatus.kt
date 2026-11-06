@@ -1,5 +1,5 @@
 package ru.practicum.android.diploma.core.network
 
-interface  NetworkStatus {
+interface NetworkStatus {
     fun isOnline(): Boolean
 }

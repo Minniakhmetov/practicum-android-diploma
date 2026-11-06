@@ -8,14 +8,13 @@ class NetworkStatusImpl(
 ) : NetworkStatus {
 
     override fun isOnline(): Boolean {
-        val network = connectivityManager.activeNetwork ?: return false
+        val network = connectivityManager.activeNetwork
+        val capabilities = network?.let {
+            connectivityManager.getNetworkCapabilities(it)
+        }
 
-        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
-
-        return capabilities.hasCapability(
-            NetworkCapabilities.NET_CAPABILITY_INTERNET
-        ) && capabilities.hasCapability(
-            NetworkCapabilities.NET_CAPABILITY_VALIDATED
-        )
+        return capabilities != null &&
+            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+            capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
     }
 }
