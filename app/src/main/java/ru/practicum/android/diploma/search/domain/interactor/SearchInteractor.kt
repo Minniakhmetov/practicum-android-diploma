@@ -1,6 +1,6 @@
 package ru.practicum.android.diploma.search.domain.interactor
 
-import ru.practicum.android.diploma.core.common.result.Response
+import ru.practicum.android.diploma.core.common.result.Resource
 import ru.practicum.android.diploma.core.domain.model.FilterSettings
 import ru.practicum.android.diploma.search.domain.model.VacanciesPage
 
@@ -9,5 +9,5 @@ interface SearchInteractor {
         text: String,
         settings: FilterSettings,
         page: Int
-    ): Response<VacanciesPage>
+    ): Resource<VacanciesPage>
 }
