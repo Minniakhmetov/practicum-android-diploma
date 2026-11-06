@@ -1,6 +1,4 @@
-package ru.practicum.android.diploma.vacancy.domain.model
-
-import ru.practicum.android.diploma.core.domain.model.Salary
+package ru.practicum.android.diploma.core.domain.model
 
 data class VacancyDetails(
     val id: String,
