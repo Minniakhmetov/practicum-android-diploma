@@ -1,17 +1,16 @@
 package ru.practicum.android.diploma.search.presentation.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.app.STUB_VACANCY_ID
 import ru.practicum.android.diploma.app.StubButton
 import ru.practicum.android.diploma.app.screenStubView
-import ru.practicum.android.diploma.app.stubTabButtons
 import ru.practicum.android.diploma.core.common.navigation.NavigationKeys
 import ru.practicum.android.diploma.core.common.navigation.navigateSafely
 
@@ -24,16 +23,16 @@ class SearchFragment : Fragment() {
     ): View {
         val navController = findNavController()
         val buttons = listOf(
-            StubButton("Открыть вакансию") {
+            StubButton(getString(R.string.vacancy_title)) {
                 navController.navigateSafely(
                     SearchFragmentDirections.actionSearchFragmentToVacancyFragment(vacancyId = STUB_VACANCY_ID),
                 )
             },
-            StubButton("Фильтр") {
+            StubButton(getString(R.string.filter_title)) {
                 navController.navigateSafely(SearchFragmentDirections.actionSearchFragmentToFilterFragment())
             },
-        ) + stubTabButtons(navController)
-        return screenStubView(title = "Экран поиска", buttons = buttons)
+        )
+        return screenStubView(title = getString(R.string.search_title), buttons = buttons)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -42,9 +41,13 @@ class SearchFragment : Fragment() {
         val savedStateHandle = findNavController().getBackStackEntry(R.id.searchFragment).savedStateHandle
         savedStateHandle.getLiveData<Boolean>(NavigationKeys.FILTER_APPLIED).observe(viewLifecycleOwner) { applied ->
             if (applied) {
-                Toast.makeText(requireContext(), "Получен filter_applied", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "${NavigationKeys.FILTER_APPLIED} received")
                 savedStateHandle.remove<Boolean>(NavigationKeys.FILTER_APPLIED)
             }
         }
+    }
+
+    private companion object {
+        const val TAG = "SearchFragment"
     }
 }

@@ -5,10 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.app.screenStubView
-import ru.practicum.android.diploma.app.stubBackButton
 
 // Заглушка экрана (#41, #42), заменяется настоящим экраном в задачах фичи
 class VacancyFragment : Fragment() {
@@ -20,7 +19,7 @@ class VacancyFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View = screenStubView(
-        title = "Детали вакансии\nvacancyId: ${args.vacancyId}",
-        buttons = listOf(stubBackButton(findNavController())),
+        title = getString(R.string.vacancy_title) + "\n" + args.vacancyId,
+        buttons = emptyList(),
     )
 }

@@ -16,30 +16,15 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.text.style.TextAlign
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavController
-import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.core.designsystem.theme.Dimens
 import ru.practicum.android.diploma.core.designsystem.theme.DiplomaTheme
 
-// Временные заглушки экранов (#41, #42) для проверки навигации.
+// Временные заглушки экранов (#41-#43) для проверки навигации.
 // Удаляется, когда во всех фичах появятся настоящие экраны.
 
 internal const val STUB_VACANCY_ID = "0000347f-1440-3f6f-a91a-d52c15a41021"
 
 internal class StubButton(val title: String, val onClick: () -> Unit)
-
-// Переключение вкладок до появления нижней панели (#43)
-internal fun stubTabButtons(navController: NavController): List<StubButton> =
-    listOf(
-        "Вкладка \"Главная\"" to R.id.searchFragment,
-        "Вкладка \"Избранное\"" to R.id.favoritesFragment,
-        "Вкладка \"Команда\"" to R.id.teamFragment,
-    )
-        .filter { (_, destinationId) -> destinationId != navController.currentDestination?.id }
-        .map { (title, destinationId) -> StubButton(title) { navController.navigate(destinationId) } }
-
-internal fun stubBackButton(navController: NavController) =
-    StubButton("Назад") { navController.popBackStack() }
 
 // ComposeView с заглушкой для onCreateView фрагмента
 internal fun Fragment.screenStubView(

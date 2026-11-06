@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Нижняя панель: высота 56 (+ отступ под системную панель), без плашки под активной иконкой, подписи Regular 12/16 -->
+    <style name="Widget.Diploma.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
+        <item name="android:minHeight">56dp</item>
+        <!-- По макету: отступ 8, иконка 24, подпись 16 без зазора, отступ 8 -->
+        <item name="itemPaddingTop">8dp</item>
+        <item name="itemPaddingBottom">8dp</item>
+        <item name="activeIndicatorLabelPadding">0dp</item>
+        <item name="android:background">?android:attr/windowBackground</item>
+        <item name="itemIconTint">@color/bottom_navigation_item</item>
+        <item name="itemTextColor">@color/bottom_navigation_item</item>
+        <item name="itemActiveIndicatorStyle">@null</item>
+        <!-- Без плашки ripple заливает всю вкладку, в макете эффекта нажатия нет -->
+        <item name="itemRippleColor">@android:color/transparent</item>
+        <item name="itemTextAppearanceActive">@style/TextAppearance.Diploma.BottomNavigationLabel</item>
+        <item name="itemTextAppearanceInactive">@style/TextAppearance.Diploma.BottomNavigationLabel</item>
+        <item name="itemTextAppearanceActiveBoldEnabled">false</item>
+        <item name="labelVisibilityMode">labeled</item>
+    </style>
+
+    <style name="TextAppearance.Diploma.BottomNavigationLabel" parent="TextAppearance.Material3.LabelMedium">
+        <item name="fontFamily">@font/ys_display_regular</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textSize">12sp</item>
+        <item name="lineHeight">16sp</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+</resources>
