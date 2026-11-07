@@ -10,9 +10,7 @@ fun <T> debounce(
     scope: CoroutineScope,
     action: suspend (T) -> Unit
 ): (T) -> Unit {
-
     var job: Job? = null
-
     return { value ->
         job?.cancel()
 
