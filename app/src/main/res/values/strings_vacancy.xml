@@ -1,0 +1,8 @@
+<resources>
+    <string name="vacancy_title">Вакансия</string>
+    <string name="vacancy_not_found">Вакансия не найдена или удалена</string>
+
+    <!-- Заголовки разделов -->
+    <string name="vacancy_experience">Требуемый опыт</string>
+    <string name="vacancy_key_skills">Ключевые навыки</string>
+</resources>
