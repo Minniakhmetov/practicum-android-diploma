@@ -1,4 +1,4 @@
-package ru.practicum.android.diploma.core.data.api
+package ru.practicum.android.diploma.core.network
 
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -6,16 +6,11 @@ import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import ru.practicum.android.diploma.core.common.result.ErrorType
 import ru.practicum.android.diploma.core.common.result.Resource
-
-import ru.practicum.android.diploma.core.network.NetworkClient
-import ru.practicum.android.diploma.core.network.NetworkStatus
 import java.io.IOException
-
 
 class RetrofitNetworkClient(
     private val networkStatus: NetworkStatus
 ) : NetworkClient {
-
     override suspend fun <T> execute(
         request: suspend () -> T
     ): Resource<T> {
