@@ -6,10 +6,9 @@ import ru.practicum.android.diploma.core.domain.model.Employer
 import ru.practicum.android.diploma.core.domain.model.Employment
 import ru.practicum.android.diploma.core.domain.model.Experience
 import ru.practicum.android.diploma.core.domain.model.Phone
-import ru.practicum.android.diploma.core.domain.model.Salary
 import ru.practicum.android.diploma.core.domain.model.Schedule
 import ru.practicum.android.diploma.core.domain.model.VacancyDetails
-import ru.practicum.android.diploma.core.network.dto.SalaryDto
+import ru.practicum.android.diploma.core.network.mapper.toDomain
 import ru.practicum.android.diploma.vacancy.data.dto.AddressDto
 import ru.practicum.android.diploma.vacancy.data.dto.ContactsDto
 import ru.practicum.android.diploma.vacancy.data.dto.EmployerDto
@@ -35,13 +34,6 @@ internal fun VacancyDetailsResponse.toDomain(): VacancyDetails =
         skills = skills,
         shareUrl = url,
         industryName = industry.name
-    )
-
-private fun SalaryDto.toDomain(): Salary =
-    Salary(
-        from = from,
-        to = to,
-        currency = currency
     )
 
 private fun AddressDto.toDomain(): Address =
