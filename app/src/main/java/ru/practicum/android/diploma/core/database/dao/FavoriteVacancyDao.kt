@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 import ru.practicum.android.diploma.core.database.entity.FavoriteVacancyEntity
+import ru.practicum.android.diploma.core.database.entity.FavoriteVacancyShortDb
 
 @Dao
 interface FavoriteVacancyDao {
@@ -15,8 +16,20 @@ interface FavoriteVacancyDao {
     @Query("DELETE FROM favorite_vacancies WHERE id = :id")
     suspend fun deleteById(id: String)
 
-    @Query("SELECT * FROM favorite_vacancies ORDER BY addedAt DESC")
-    fun getAll(): Flow<List<FavoriteVacancyEntity>>
+    @Query("""
+    SELECT
+        id,
+        name,
+        employer_name AS employerName,
+        address_city AS area,
+        salary_from,
+        salary_to,
+        salary_currency,
+        addedAt
+    FROM favorite_vacancies
+    ORDER BY addedAt DESC
+""")
+    fun getAllShorts(): Flow<List<FavoriteVacancyShortDb>>
 
     @Query("SELECT * FROM favorite_vacancies WHERE id = :id LIMIT 1")
     suspend fun getById(id: String): FavoriteVacancyEntity?

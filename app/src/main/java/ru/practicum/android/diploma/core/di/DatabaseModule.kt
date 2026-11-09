@@ -11,7 +11,7 @@ val databaseModule = module {
         Room.databaseBuilder(
             androidContext(),
             AppDatabase::class.java,
-            "favorite_vacancies_database"
+            "app_database.db"
         ).build()
     }
 
