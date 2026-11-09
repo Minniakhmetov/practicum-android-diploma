@@ -1,6 +1,7 @@
 <resources>
     <string name="vacancy_title">Вакансия</string>
     <string name="vacancy_not_found">Вакансия не найдена или удалена</string>
+    <string name="vacancy_share">Поделиться</string>
 
     <!-- Заголовки разделов -->
     <string name="vacancy_experience">Требуемый опыт</string>
