@@ -4,15 +4,22 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
-import ru.practicum.android.diploma.R
-import ru.practicum.android.diploma.app.screenStubView
+import ru.practicum.android.diploma.core.designsystem.theme.DiplomaTheme
 
-// Заглушка экрана (#41, #42), заменяется настоящим экраном в задачах фичи
 class TeamFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
-    ): View = screenStubView(title = getString(R.string.team), buttons = emptyList())
+    ): View = ComposeView(requireContext()).apply {
+        setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+        setContent {
+            DiplomaTheme {
+                TeamScreen()
+            }
+        }
+    }
 }
