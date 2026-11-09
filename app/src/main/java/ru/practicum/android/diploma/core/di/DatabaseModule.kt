@@ -1,7 +1,21 @@
 package ru.practicum.android.diploma.core.di
 
+import androidx.room.Room
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
+import ru.practicum.android.diploma.core.database.AppDatabase
+import ru.practicum.android.diploma.core.database.dao.FavoriteVacancyDao
 
 val databaseModule = module {
-    // Пусто на начальном этапе. Наполняется в задачах фичи
+    single<AppDatabase> {
+        Room.databaseBuilder(
+            androidContext(),
+            AppDatabase::class.java,
+            "favorite_vacancies_database"
+        ).build()
+    }
+
+    single<FavoriteVacancyDao> {
+        get<AppDatabase>().favoriteVacancyDao()
+    }
 }
