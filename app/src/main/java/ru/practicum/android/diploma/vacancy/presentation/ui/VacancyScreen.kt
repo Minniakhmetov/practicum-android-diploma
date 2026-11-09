@@ -1,5 +1,6 @@
 package ru.practicum.android.diploma.vacancy.presentation.ui
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,8 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,12 +18,12 @@ import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.core.designsystem.components.AppIconButton
 import ru.practicum.android.diploma.core.designsystem.components.AppLoader
 import ru.practicum.android.diploma.core.designsystem.components.AppTopBar
+import ru.practicum.android.diploma.core.designsystem.components.Placeholder
 import ru.practicum.android.diploma.core.designsystem.theme.Dimens
 import ru.practicum.android.diploma.core.designsystem.theme.DiplomaTheme
 import ru.practicum.android.diploma.vacancy.presentation.state.VacancyState
 
-// Экран вакансии. Нижней панели навигации здесь нет, поэтому отступы под обе системные панели.
-// Плейсхолдеры ошибок с иллюстрациями - в #72
+// Экран вакансии. Нижней панели навигации здесь нет, поэтому отступы под обе системные панели
 @Composable
 fun VacancyScreen(
     state: VacancyState,
@@ -67,9 +66,22 @@ fun VacancyScreen(
                 onPhoneClick = onPhoneClick,
             )
             VacancyState.Loading -> CenteredState { AppLoader() }
-            VacancyState.NoInternet -> CenteredState { VacancyStateText(stringResource(R.string.no_internet)) }
-            VacancyState.ServerError -> CenteredState { VacancyStateText(stringResource(R.string.server_error)) }
-            VacancyState.NotFound -> CenteredState { VacancyStateText(stringResource(R.string.vacancy_not_found)) }
+            // Отдельного макета "нет интернета" для вакансии нет: иллюстрация как на поиске (экран 5).
+            // Показ избранной вакансии из БД без интернета - в #78
+            VacancyState.NoInternet -> VacancyPlaceholder(
+                image = R.drawable.img_no_internet_328x223,
+                text = stringResource(R.string.no_internet),
+            )
+            // Экран 40
+            VacancyState.ServerError -> VacancyPlaceholder(
+                image = R.drawable.img_server_error_vacancy_328x223,
+                text = stringResource(R.string.server_error),
+            )
+            // Экран 30.1: сервер ответил 404
+            VacancyState.NotFound -> VacancyPlaceholder(
+                image = R.drawable.img_vacancy_not_found_328x223,
+                text = stringResource(R.string.vacancy_not_found),
+            )
         }
     }
 }
@@ -116,11 +128,13 @@ private fun CenteredState(content: @Composable () -> Unit) {
     }
 }
 
+// Плейсхолдер по центру области под верхней панелью, кнопка "Назад" остается доступной
 @Composable
-private fun VacancyStateText(text: String) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.titleLarge,
-        color = DiplomaTheme.colors.primaryText,
-    )
+private fun VacancyPlaceholder(
+    @DrawableRes image: Int,
+    text: String,
+) {
+    CenteredState {
+        Placeholder(image = image, text = text)
+    }
 }
