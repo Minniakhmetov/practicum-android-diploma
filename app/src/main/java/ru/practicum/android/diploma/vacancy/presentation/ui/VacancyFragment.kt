@@ -35,6 +35,8 @@ class VacancyFragment : Fragment() {
                     state = state,
                     onBackClick = ::navigateBack,
                     onShareClick = viewModel::onShareClick,
+                    onEmailClick = viewModel::onEmailClick,
+                    onPhoneClick = viewModel::onPhoneClick,
                 )
             }
         }
