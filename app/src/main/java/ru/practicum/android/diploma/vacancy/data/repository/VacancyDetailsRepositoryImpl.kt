@@ -15,12 +15,8 @@ class VacancyDetailsRepositoryImpl(
     override suspend fun getVacancyDetails(
         vacancyId: String
     ): Resource<VacancyDetails> {
-        val result = networkClient.execute {
-            vacancyApi.getVacancyDetails(vacancyId)
-        }
-        return when (result) {
-            is Resource.Success -> Resource.Success(result.data.toDomain())
-            is Resource.Error -> result
+        return networkClient.execute {
+            vacancyApi.getVacancyDetails(vacancyId).toDomain()
         }
     }
 }

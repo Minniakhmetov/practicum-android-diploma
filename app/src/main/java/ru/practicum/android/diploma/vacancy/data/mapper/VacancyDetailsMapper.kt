@@ -32,7 +32,7 @@ internal fun VacancyDetailsResponse.toDomain(): VacancyDetails =
         employer = employer.toDomain(),
         area = area.name,
         skills = skills,
-        shareUrl = url,
+        shareUrl = "https://$url",
         industryName = industry.name
     )
 
