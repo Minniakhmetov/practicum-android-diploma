@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.practicum.android.diploma.R
+import ru.practicum.android.diploma.core.common.format.SalaryFormatter
 import ru.practicum.android.diploma.core.common.result.ErrorType
 import ru.practicum.android.diploma.core.common.result.Resource
 import ru.practicum.android.diploma.vacancy.domain.interactor.VacancyInteractor
@@ -20,6 +22,7 @@ import ru.practicum.android.diploma.vacancy.presentation.state.VacancyState
 class VacancyViewModel(
     private val vacancyId: String,
     private val vacancyInteractor: VacancyInteractor,
+    private val salaryFormatter: SalaryFormatter,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<VacancyState>(VacancyState.Loading)
@@ -49,7 +52,10 @@ class VacancyViewModel(
     private fun loadVacancy() {
         viewModelScope.launch {
             _state.value = when (val result = vacancyInteractor.getVacancyDetails(vacancyId)) {
-                is Resource.Success -> VacancyState.Content(result.data)
+                is Resource.Success -> VacancyState.Content(
+                    vacancy = result.data,
+                    salary = salaryFormatter.format(result.data.salary, R.string.salary_not_specified),
+                )
                 is Resource.Error -> result.type.toState()
             }
         }
