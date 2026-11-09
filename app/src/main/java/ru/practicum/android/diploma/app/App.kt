@@ -3,6 +3,7 @@ package ru.practicum.android.diploma.app
 import android.app.Application
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
+import ru.practicum.android.diploma.core.di.commonModule
 import ru.practicum.android.diploma.core.di.databaseModule
 import ru.practicum.android.diploma.core.di.networkModule
 import ru.practicum.android.diploma.favorites.di.favoritesModule
@@ -17,6 +18,7 @@ class App : Application() {
         startKoin {
             androidContext(this@App)
             modules(
+                commonModule,
                 networkModule,
                 databaseModule,
                 searchModule,
