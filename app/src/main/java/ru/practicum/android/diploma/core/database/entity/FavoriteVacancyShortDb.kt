@@ -10,5 +10,6 @@ data class FavoriteVacancyShortDb(
     val area: String?,
     @Embedded(prefix = "salary_")
     val salary: SalaryEntity?,
+    val logoUrl: String?,
     val addedAt: Long
 )

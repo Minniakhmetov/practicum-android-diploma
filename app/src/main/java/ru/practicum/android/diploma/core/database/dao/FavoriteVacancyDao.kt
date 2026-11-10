@@ -21,10 +21,11 @@ interface FavoriteVacancyDao {
         id,
         name,
         employer_name AS employerName,
-        address_city AS area,
+        area,
         salary_from,
         salary_to,
         salary_currency,
+        employer_logoUrl AS logoUrl,
         addedAt
     FROM favorite_vacancies
     ORDER BY addedAt DESC
