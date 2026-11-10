@@ -7,4 +7,12 @@
     <!-- Заголовки разделов -->
     <string name="vacancy_experience">Требуемый опыт</string>
     <string name="vacancy_key_skills">Ключевые навыки</string>
+    <!-- Используется, только если в HTML описания нет своего заголовка -->
+    <string name="vacancy_description">Описание вакансии</string>
+    <string name="vacancy_contacts">Контакты</string>
+
+    <!-- Подписи контактов -->
+    <string name="vacancy_contact_person">Контактное лицо</string>
+    <string name="vacancy_email">E-mail</string>
+    <string name="vacancy_phone">Телефон</string>
 </resources>

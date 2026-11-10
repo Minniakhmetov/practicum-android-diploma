@@ -1,6 +1,7 @@
 package ru.practicum.android.diploma.vacancy.presentation.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,12 +24,14 @@ import ru.practicum.android.diploma.core.designsystem.theme.DiplomaTheme
 import ru.practicum.android.diploma.vacancy.presentation.state.VacancyState
 
 // Экран вакансии. Нижней панели навигации здесь нет, поэтому отступы под обе системные панели.
-// Описание, навыки и контакты - в #71, плейсхолдеры ошибок с иллюстрациями - в #72
+// Плейсхолдеры ошибок с иллюстрациями - в #72
 @Composable
 fun VacancyScreen(
     state: VacancyState,
     onBackClick: () -> Unit,
     onShareClick: () -> Unit,
+    onEmailClick: (String) -> Unit,
+    onPhoneClick: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -58,7 +61,11 @@ fun VacancyScreen(
             }
         }
         when (state) {
-            is VacancyState.Content -> VacancyContent(state = state)
+            is VacancyState.Content -> VacancyContent(
+                state = state,
+                onEmailClick = onEmailClick,
+                onPhoneClick = onPhoneClick,
+            )
             VacancyState.Loading -> CenteredState { AppLoader() }
             VacancyState.NoInternet -> CenteredState { VacancyStateText(stringResource(R.string.no_internet)) }
             VacancyState.ServerError -> CenteredState { VacancyStateText(stringResource(R.string.server_error)) }
@@ -67,9 +74,13 @@ fun VacancyScreen(
     }
 }
 
-// Весь контент прокручивается. По макету: 16 от верхней панели + 8 внутреннего отступа блока названия
+// Весь контент прокручивается. По макету: 24 от верхней панели и 24 между разделами
 @Composable
-private fun VacancyContent(state: VacancyState.Content) {
+private fun VacancyContent(
+    state: VacancyState.Content,
+    onEmailClick: (String) -> Unit,
+    onPhoneClick: (String) -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -80,8 +91,16 @@ private fun VacancyContent(state: VacancyState.Content) {
                 top = Dimens.spacing24,
                 bottom = Dimens.spacing24,
             ),
+        verticalArrangement = Arrangement.spacedBy(Dimens.spacing24),
     ) {
         VacancyMainInfo(vacancy = state.vacancy, salary = state.salary)
+        VacancyDescription(html = state.vacancy.description)
+        VacancySkills(skills = state.vacancy.skills)
+        VacancyContacts(
+            contacts = state.vacancy.contacts,
+            onEmailClick = onEmailClick,
+            onPhoneClick = onPhoneClick,
+        )
     }
 }
 
