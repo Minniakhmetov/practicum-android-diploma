@@ -5,7 +5,12 @@ import ru.practicum.android.diploma.core.domain.model.VacancyDetails
 // Состояние экрана вакансии. Начальное - Loading, чтобы до ответа сервера не мигала ошибка
 sealed interface VacancyState {
     data object Loading : VacancyState
-    data class Content(val vacancy: VacancyDetails) : VacancyState
+
+    // salary - готовая строка из SalaryFormatter: экран не форматирует данные сам
+    data class Content(
+        val vacancy: VacancyDetails,
+        val salary: String,
+    ) : VacancyState
     data object NoInternet : VacancyState
     data object ServerError : VacancyState
 

@@ -2,6 +2,7 @@
     <string name="vacancy_title">Вакансия</string>
     <string name="vacancy_not_found">Вакансия не найдена или удалена</string>
     <string name="vacancy_share">Поделиться</string>
+    <string name="vacancy_add_to_favorites">Добавить в избранное</string>
 
     <!-- Заголовки разделов -->
     <string name="vacancy_experience">Требуемый опыт</string>
