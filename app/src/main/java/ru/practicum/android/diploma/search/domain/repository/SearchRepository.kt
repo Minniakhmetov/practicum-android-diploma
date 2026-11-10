@@ -1,0 +1,13 @@
+package com.example.sprint28.app
+
+import ru.practicum.android.diploma.core.common.result.Resource
+import ru.practicum.android.diploma.core.domain.model.FilterSettings
+import ru.practicum.android.diploma.search.domain.model.VacanciesPage
+
+interface SearchRepository {
+    suspend fun searchVacancies(
+        text: String,
+        settings: FilterSettings,
+        page: Int
+    ): Resource<VacanciesPage>
+}
