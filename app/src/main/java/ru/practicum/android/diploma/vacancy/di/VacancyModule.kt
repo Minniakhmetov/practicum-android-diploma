@@ -41,6 +41,7 @@ val vacancyModule = module {
         VacancyViewModel(
             vacancyId = vacancyId,
             vacancyInteractor = get(),
+            favoritesInteractor = get(),
             salaryFormatter = get()
         )
     }

@@ -3,13 +3,16 @@ package ru.practicum.android.diploma.vacancy.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.core.common.format.SalaryFormatter
 import ru.practicum.android.diploma.core.common.result.ErrorType
 import ru.practicum.android.diploma.core.common.result.Resource
+import ru.practicum.android.diploma.favorites.domain.interactor.FavoritesInteractor
 import ru.practicum.android.diploma.vacancy.domain.interactor.VacancyInteractor
 import ru.practicum.android.diploma.vacancy.presentation.state.VacancyState
 
@@ -18,11 +21,21 @@ import ru.practicum.android.diploma.vacancy.presentation.state.VacancyState
 class VacancyViewModel(
     private val vacancyId: String,
     private val vacancyInteractor: VacancyInteractor,
+    private val favoritesInteractor: FavoritesInteractor,
     private val salaryFormatter: SalaryFormatter,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<VacancyState>(VacancyState.Loading)
     val state: StateFlow<VacancyState> = _state.asStateFlow()
+
+    // Признак "в избранном" подписан на БД: иконка меняется сразу после нажатия
+    // и остаётся верной после возврата с экрана "Избранное"
+    val isFavorite: StateFlow<Boolean> = favoritesInteractor.isFavorite(vacancyId)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+            initialValue = false,
+        )
 
     init {
         loadVacancy()
@@ -31,6 +44,18 @@ class VacancyViewModel(
     fun onShareClick() {
         val vacancy = (_state.value as? VacancyState.Content)?.vacancy ?: return
         vacancyInteractor.shareVacancy(vacancy.shareUrl)
+    }
+
+    // Добавить или удалить можно только загруженную вакансию: в БД сохраняется она целиком
+    fun onFavoriteClick() {
+        val vacancy = (_state.value as? VacancyState.Content)?.vacancy ?: return
+        viewModelScope.launch {
+            if (isFavorite.value) {
+                favoritesInteractor.removeFromFavorites(vacancy.id)
+            } else {
+                favoritesInteractor.addToFavorites(vacancy)
+            }
+        }
     }
 
     fun onEmailClick(email: String) {
@@ -57,5 +82,10 @@ class VacancyViewModel(
         ErrorType.NoInternet -> VacancyState.NoInternet
         ErrorType.Server -> VacancyState.ServerError
         ErrorType.NotFound -> VacancyState.NotFound
+    }
+
+    private companion object {
+        // Подписка на БД живёт ещё 5 секунд после ухода с экрана (смена темы, звонилка)
+        const val STOP_TIMEOUT_MILLIS = 5_000L
     }
 }
