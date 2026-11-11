@@ -1,4 +1,4 @@
-package com.example.sprint28.app
+package ru.practicum.android.diploma.search.domain.interactor
 
 import ru.practicum.android.diploma.core.common.result.Resource
 import ru.practicum.android.diploma.core.domain.model.FilterSettings
