@@ -3,6 +3,7 @@
     <string name="vacancy_not_found">Вакансия не найдена или удалена</string>
     <string name="vacancy_share">Поделиться</string>
     <string name="vacancy_add_to_favorites">Добавить в избранное</string>
+    <string name="vacancy_remove_from_favorites">Удалить из избранного</string>
     <!-- Заголовки системного диалога выбора приложения -->
     <string name="vacancy_send_email">Написать письмо</string>
     <string name="vacancy_call">Позвонить</string>

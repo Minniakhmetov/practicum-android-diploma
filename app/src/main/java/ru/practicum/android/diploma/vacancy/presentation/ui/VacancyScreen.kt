@@ -27,8 +27,10 @@ import ru.practicum.android.diploma.vacancy.presentation.state.VacancyState
 @Composable
 fun VacancyScreen(
     state: VacancyState,
+    isFavorite: Boolean,
     onBackClick: () -> Unit,
     onShareClick: () -> Unit,
+    onFavoriteClick: () -> Unit,
     onEmailClick: (String) -> Unit,
     onPhoneClick: (String) -> Unit,
     modifier: Modifier = Modifier,
@@ -51,12 +53,7 @@ fun VacancyScreen(
                     contentDescription = stringResource(R.string.vacancy_share),
                     onClick = onShareClick,
                 )
-                // Пока только иконка: добавление в избранное - в #77
-                AppIconButton(
-                    iconRes = R.drawable.ic_favorites_off_24,
-                    contentDescription = stringResource(R.string.vacancy_add_to_favorites),
-                    onClick = {},
-                )
+                FavoriteButton(isFavorite = isFavorite, onClick = onFavoriteClick)
             }
         }
         when (state) {
@@ -112,6 +109,28 @@ private fun VacancyContent(
             contacts = state.vacancy.contacts,
             onEmailClick = onEmailClick,
             onPhoneClick = onPhoneClick,
+        )
+    }
+}
+
+// Невыбранная - контур цвета текста, выбранная - красная заливка (Red #F56B6C)
+@Composable
+private fun FavoriteButton(
+    isFavorite: Boolean,
+    onClick: () -> Unit,
+) {
+    if (isFavorite) {
+        AppIconButton(
+            iconRes = R.drawable.ic_favorites_on_24,
+            contentDescription = stringResource(R.string.vacancy_remove_from_favorites),
+            onClick = onClick,
+            tint = DiplomaTheme.colors.attention,
+        )
+    } else {
+        AppIconButton(
+            iconRes = R.drawable.ic_favorites_off_24,
+            contentDescription = stringResource(R.string.vacancy_add_to_favorites),
+            onClick = onClick,
         )
     }
 }

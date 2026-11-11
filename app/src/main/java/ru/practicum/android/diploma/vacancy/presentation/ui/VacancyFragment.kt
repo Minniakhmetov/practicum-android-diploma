@@ -31,10 +31,13 @@ class VacancyFragment : Fragment() {
         setContent {
             DiplomaTheme {
                 val state by viewModel.state.collectAsStateWithLifecycle()
+                val isFavorite by viewModel.isFavorite.collectAsStateWithLifecycle()
                 VacancyScreen(
                     state = state,
+                    isFavorite = isFavorite,
                     onBackClick = ::navigateBack,
                     onShareClick = viewModel::onShareClick,
+                    onFavoriteClick = viewModel::onFavoriteClick,
                     onEmailClick = viewModel::onEmailClick,
                     onPhoneClick = viewModel::onPhoneClick,
                 )
