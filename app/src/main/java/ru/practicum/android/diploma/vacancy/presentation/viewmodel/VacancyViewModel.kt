@@ -12,6 +12,7 @@ import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.core.common.format.SalaryFormatter
 import ru.practicum.android.diploma.core.common.result.ErrorType
 import ru.practicum.android.diploma.core.common.result.Resource
+import ru.practicum.android.diploma.core.domain.model.VacancyDetails
 import ru.practicum.android.diploma.favorites.domain.interactor.FavoritesInteractor
 import ru.practicum.android.diploma.vacancy.domain.interactor.VacancyInteractor
 import ru.practicum.android.diploma.vacancy.presentation.state.VacancyState
@@ -69,14 +70,26 @@ class VacancyViewModel(
     private fun loadVacancy() {
         viewModelScope.launch {
             _state.value = when (val result = vacancyInteractor.getVacancyDetails(vacancyId)) {
-                is Resource.Success -> VacancyState.Content(
-                    vacancy = result.data,
-                    salary = salaryFormatter.format(result.data.salary, R.string.salary_not_specified),
-                )
-                is Resource.Error -> result.type.toState()
+                is Resource.Success -> result.data.toContent()
+                is Resource.Error -> onLoadError(result.type)
             }
         }
     }
+
+    // Нет сети или сервер не ответил - показываем сохранённую копию из избранного, если она есть.
+    // 404 - вакансию удалили на сервере: по ТЗ удаляем её и из избранного и показываем ошибку
+    private suspend fun onLoadError(type: ErrorType): VacancyState {
+        if (type == ErrorType.NotFound) {
+            favoritesInteractor.removeFromFavorites(vacancyId)
+            return VacancyState.NotFound
+        }
+        return favoritesInteractor.getFavoriteVacancy(vacancyId)?.toContent() ?: type.toState()
+    }
+
+    private fun VacancyDetails.toContent() = VacancyState.Content(
+        vacancy = this,
+        salary = salaryFormatter.format(salary, R.string.salary_not_specified),
+    )
 
     private fun ErrorType.toState(): VacancyState = when (this) {
         ErrorType.NoInternet -> VacancyState.NoInternet
