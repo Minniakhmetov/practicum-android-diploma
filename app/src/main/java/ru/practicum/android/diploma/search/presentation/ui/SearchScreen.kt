@@ -213,6 +213,7 @@ private class SearchStatePreviewProvider : PreviewParameterProvider<SearchState>
                         salary = "от 100 000 ₽",
                     )
                 },
+                hasMore = false
             ),
         ),
         SearchState(
