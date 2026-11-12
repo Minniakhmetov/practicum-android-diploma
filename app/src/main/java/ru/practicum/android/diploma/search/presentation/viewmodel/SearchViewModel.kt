@@ -3,8 +3,11 @@ package ru.practicum.android.diploma.search.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -17,6 +20,7 @@ import ru.practicum.android.diploma.core.domain.model.FilterSettings
 import ru.practicum.android.diploma.core.domain.model.VacancyShort
 import ru.practicum.android.diploma.search.domain.interactor.SearchInteractor
 import ru.practicum.android.diploma.search.domain.model.VacanciesPage
+import ru.practicum.android.diploma.search.presentation.state.SearchEvent
 import ru.practicum.android.diploma.search.presentation.state.SearchResultState
 import ru.practicum.android.diploma.search.presentation.state.SearchState
 import ru.practicum.android.diploma.search.presentation.state.VacancyShortItem
@@ -27,6 +31,9 @@ class SearchViewModel(
 ) : ViewModel() {
     private val _state = MutableStateFlow(SearchState())
     val state: StateFlow<SearchState> = _state.asStateFlow()
+
+    private val _events = MutableSharedFlow<SearchEvent>(extraBufferCapacity = 1)
+    val events: SharedFlow<SearchEvent> = _events.asSharedFlow()
 
     // Отдельные Job: первая страница/новый query vs следующая страница.
     private var searchJob: Job? = null
@@ -157,7 +164,11 @@ class SearchViewModel(
         new: List<VacancyShortItem>,
         page: Int,
     ): List<VacancyShortItem> =
-        if (page == FIRST_PAGE) new else existing + new
+        if (page == FIRST_PAGE) {
+            new.distinctBy { it.vacancy.id }
+        } else {
+            (existing + new).distinctBy { it.vacancy.id }
+        }
 
     private fun createInitialContent(
         uiItems: List<VacancyShortItem>,
@@ -177,20 +188,22 @@ class SearchViewModel(
 
     private fun handleError(error: ErrorType, page: Int) {
         if (page == FIRST_PAGE) {
-            _state.update {
-                it.copy(result = SearchResultState.Error(error))
+            _state.update { it.copy(result = SearchResultState.Error(error)) }
+            return
+        }
+        _state.update { state ->
+            val result = state.result
+            if (result is SearchResultState.Content) {
+                state.copy(result = result.copy(isNextPageLoading = false))
+            } else {
+                state
             }
-        } else {
-            // Пагинация: ошибку не показываем, просто убираем футер-лоадер.
-            // Ошибка в Toast будет добавлена в #82
-            _state.update { state ->
-                val result = state.result
-                if (result is SearchResultState.Content) {
-                    state.copy(result = result.copy(isNextPageLoading = false))
-                } else {
-                    state
-                }
-            }
+        }
+
+        when (error) {
+            ErrorType.NoInternet, ErrorType.Server ->
+                _events.tryEmit(SearchEvent.NextPageError(error))
+            ErrorType.NotFound -> Unit
         }
     }
 
