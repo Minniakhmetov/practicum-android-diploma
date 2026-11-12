@@ -20,7 +20,7 @@ sealed interface SearchResultState {
         val vacancies: List<VacancyShortItem>,
         val found: Int,
         val isNextPageLoading: Boolean = false,
-        val hasMore: Boolean = true
+        val hasMore: Boolean
     ) : SearchResultState
 
     // Полноэкранная ошибка: списка нет
