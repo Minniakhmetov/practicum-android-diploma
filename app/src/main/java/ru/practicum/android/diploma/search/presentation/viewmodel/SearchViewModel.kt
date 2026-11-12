@@ -27,11 +27,7 @@ class SearchViewModel(
 ) : ViewModel() {
     private val _state = MutableStateFlow(SearchState())
     val state: StateFlow<SearchState> = _state.asStateFlow()
-
-    // Отдельные Job: первая страница/новый query vs следующая страница.
     private var searchJob: Job? = null
-    private var nextPageJob: Job? = null
-    private var currentPage: Int = FIRST_PAGE
 
     // Фильтр будет реализовать в Epic_4
     private var currentSettings: FilterSettings = FilterSettings()
@@ -49,7 +45,6 @@ class SearchViewModel(
         if (query.isBlank()) {
             searchDebounce.cancel()
             cancelAllJobs()
-            resetPaging()
             _state.value = SearchState(query = "")
             return
         }
@@ -71,56 +66,34 @@ class SearchViewModel(
         restartSearch(query)
     }
 
-    // Для пагинации (реализация в #54)
-    fun onLoadNextPage() {
-        val s = _state.value
-        val content = s.result as? SearchResultState.Content
-        val canLoadNext = content != null &&
-            s.query.isNotBlank() &&
-            !content.isNextPageLoading &&
-            content.hasMore
-
-        if (canLoadNext) {
-            performSearch(s.query, currentSettings, currentPage + 1)
-        }
-    }
-
     // Перезапуск
     private fun restartSearch(query: String) {
         searchDebounce.cancel()
         cancelAllJobs()
-        // resetPaging выполнится внутри performSearch для page == FIRST_PAGE
         performSearch(query, currentSettings, FIRST_PAGE)
     }
 
     private fun performSearch(query: String, settings: FilterSettings, page: Int) {
-        if (page == FIRST_PAGE) {
-            resetPaging()
-            searchJob?.cancel()
-            searchJob = viewModelScope.launch {
-                setFirstPageLoading()
-                val result = searchInteractor.searchVacancies(query, settings, page)
-                handleResult(result, page)
-            }
-        } else {
-            nextPageJob?.cancel()
-            nextPageJob = viewModelScope.launch {
-                setNextPageLoading()
-                val result = searchInteractor.searchVacancies(query, settings, page)
+        cancelAllJobs()
+        setFirstPageLoading()
+        searchJob = viewModelScope.launch {
+            val result = searchInteractor.searchVacancies(query, settings, page)
+            if (isQueryStillActual(query)) {
                 handleResult(result, page)
             }
         }
     }
+
+    private fun isQueryStillActual(query: String): Boolean = query == _state.value.query
 
     private fun handleResult(result: Resource<VacanciesPage>, page: Int) {
         when (result) {
             is Resource.Success -> handleSuccess(result.data, page)
-            is Resource.Error -> handleError(result.type, page)
+            is Resource.Error -> handleError(result.type)
         }
     }
 
     private fun handleSuccess(pageData: VacanciesPage, page: Int) {
-        currentPage = page
         val newHasMore = computeHasMore(pageData, page)
         val uiItems = pageData.items.map(::toUiItem)
         updateContentState(pageData, page, uiItems, newHasMore)
@@ -175,22 +148,9 @@ class SearchViewModel(
             )
         }
 
-    private fun handleError(error: ErrorType, page: Int) {
-        if (page == FIRST_PAGE) {
-            _state.update {
-                it.copy(result = SearchResultState.Error(error))
-            }
-        } else {
-            // Пагинация: ошибку не показываем, просто убираем футер-лоадер.
-            // Ошибка в Toast будет добавлена в #82
-            _state.update { state ->
-                val result = state.result
-                if (result is SearchResultState.Content) {
-                    state.copy(result = result.copy(isNextPageLoading = false))
-                } else {
-                    state
-                }
-            }
+    private fun handleError(error: ErrorType) {
+        _state.update {
+            it.copy(result = SearchResultState.Error(error))
         }
     }
 
@@ -200,24 +160,8 @@ class SearchViewModel(
         }
     }
 
-    private fun setNextPageLoading() {
-        _state.update { state ->
-            val result = state.result
-            if (result is SearchResultState.Content) {
-                state.copy(result = result.copy(isNextPageLoading = true))
-            } else {
-                state
-            }
-        }
-    }
-
     private fun cancelAllJobs() {
         searchJob?.cancel()
-        nextPageJob?.cancel()
-    }
-
-    private fun resetPaging() {
-        currentPage = FIRST_PAGE
     }
 
     override fun onCleared() {
