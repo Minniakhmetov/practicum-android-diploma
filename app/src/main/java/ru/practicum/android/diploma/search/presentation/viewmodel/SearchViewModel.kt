@@ -50,15 +50,16 @@ class SearchViewModel(
 
     // Ввод текста
     fun onQueryChanged(query: String) {
+        cancelAllJobs()
         _state.update { it.copy(query = query) }
         resetPagination()
         if (query.isBlank()) {
             searchDebounce.cancel()
-            cancelAllJobs()
-            _state.value = SearchState(query = "")
+            _state.update {
+                it.copy(query = query, result = SearchResultState.Initial)
+            }
             return
         }
-        cancelAllJobs()
         searchDebounce.start(query)
     }
 
@@ -174,7 +175,7 @@ class SearchViewModel(
         hasMore: Boolean,
     ): SearchResultState =
         if (uiItems.isEmpty()) {
-            SearchResultState.Error(ErrorType.NotFound)
+            SearchResultState.Empty
         } else {
             SearchResultState.Content(
                 vacancies = uiItems,

@@ -23,6 +23,9 @@ sealed interface SearchResultState {
         val hasMore: Boolean
     ) : SearchResultState
 
+    // Пустой результат запроса
+    data object Empty : SearchResultState
+
     // Полноэкранная ошибка: списка нет
     data class Error(val type: ErrorType) : SearchResultState
 }
