@@ -6,14 +6,19 @@
     <string name="favorites">Избранное</string>
     <string name="team">Команда</string>
 
+    <!-- Кнопка "Назад" в верхней панели (экраны вакансии и фильтра) -->
+    <string name="back">Назад</string>
+
     <!-- Плейсхолдеры ошибок -->
     <string name="no_internet">Нет интернета</string>
     <string name="server_error">Ошибка сервера</string>
     <string name="failed_to_get_vacancies">Не удалось получить список вакансий</string>
 
-    <!-- Зарплата в списке вакансий, на экране вакансии и в избранном. %1$s - сумма с валютой -->
-    <string name="salary_from">От %1$s</string>
-    <string name="salary_to">До %1$s</string>
-    <string name="salary_from_to">От %1$s до %2$s</string>
+    <!-- Зарплата в списке вакансий, на экране вакансии и в избранном (SalaryFormatter).
+         В salary_from и salary_to %1$s - сумма с валютой.
+         В salary_from_to %1$s - сумма без валюты, %2$s - сумма с валютой -->
+    <string name="salary_from">от %1$s</string>
+    <string name="salary_to">до %1$s</string>
+    <string name="salary_from_to">от %1$s до %2$s</string>
     <string name="salary_not_specified">Зарплата не указана</string>
 </resources>

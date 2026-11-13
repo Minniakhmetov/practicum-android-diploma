@@ -1,8 +1,22 @@
 <resources>
     <string name="vacancy_title">Вакансия</string>
     <string name="vacancy_not_found">Вакансия не найдена или удалена</string>
+    <string name="vacancy_share">Поделиться</string>
+    <string name="vacancy_add_to_favorites">Добавить в избранное</string>
+    <string name="vacancy_remove_from_favorites">Удалить из избранного</string>
+    <!-- Заголовки системного диалога выбора приложения -->
+    <string name="vacancy_send_email">Написать письмо</string>
+    <string name="vacancy_call">Позвонить</string>
 
     <!-- Заголовки разделов -->
     <string name="vacancy_experience">Требуемый опыт</string>
     <string name="vacancy_key_skills">Ключевые навыки</string>
+    <!-- Используется, только если в HTML описания нет своего заголовка -->
+    <string name="vacancy_description">Описание вакансии</string>
+    <string name="vacancy_contacts">Контакты</string>
+
+    <!-- Подписи контактов -->
+    <string name="vacancy_contact_person">Контактное лицо</string>
+    <string name="vacancy_email">E-mail</string>
+    <string name="vacancy_phone">Телефон</string>
 </resources>
