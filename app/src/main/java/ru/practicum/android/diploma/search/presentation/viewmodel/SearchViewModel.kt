@@ -3,8 +3,11 @@ package ru.practicum.android.diploma.search.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -27,10 +30,16 @@ class SearchViewModel(
 ) : ViewModel() {
     private val _state = MutableStateFlow(SearchState())
     val state: StateFlow<SearchState> = _state.asStateFlow()
+
+    // Одноразовое событие ошибки следующей страницы (Toast на экране)
+    private val _paginationError = MutableSharedFlow<ErrorType>(extraBufferCapacity = 1)
+    val paginationError: SharedFlow<ErrorType> = _paginationError.asSharedFlow()
     private var searchJob: Job? = null
 
     // Фильтр будет реализовать в Epic_4
     private var currentSettings: FilterSettings = FilterSettings()
+    private var currentPage: Int = FIRST_PAGE
+    private var maxPages: Int = DEFAULT_MAX_PAGES
 
     private val searchDebounce = Debounce<String>(
         delayMillis = SEARCH_DEBOUNCE_DELAY,
@@ -43,6 +52,7 @@ class SearchViewModel(
     fun onQueryChanged(query: String) {
         cancelAllJobs()
         _state.update { it.copy(query = query) }
+        resetPagination()
         if (query.isBlank()) {
             searchDebounce.cancel()
             _state.update {
@@ -67,10 +77,26 @@ class SearchViewModel(
         restartSearch(query)
     }
 
+    // Доскролл до последнего элемента списка. Многократные вызовы защищены флагом isNextPageLoading
+    fun onLastItemReached() {
+        val content = _state.value.result as? SearchResultState.Content
+        val query = _state.value.query
+        val canLoadNextPage = content != null &&
+            !content.isNextPageLoading &&
+            content.hasMore &&
+            currentPage < maxPages &&
+            query.isNotBlank()
+
+        if (canLoadNextPage) {
+            loadNextPage(query, currentSettings)
+        }
+    }
+
     // Перезапуск
     private fun restartSearch(query: String) {
         searchDebounce.cancel()
         cancelAllJobs()
+        resetPagination()
         performSearch(query, currentSettings, FIRST_PAGE)
     }
 
@@ -85,6 +111,21 @@ class SearchViewModel(
         }
     }
 
+    // Загрузка следующей страницы: список не сбрасываем, показываем индикатор внизу
+    private fun loadNextPage(query: String, settings: FilterSettings) {
+        val nextPage = currentPage + 1
+        setNextPageLoading(true)
+        searchJob = viewModelScope.launch {
+            val result = searchInteractor.searchVacancies(query, settings, nextPage)
+            if (isQueryStillActual(query)) {
+                when (result) {
+                    is Resource.Success -> handleSuccess(result.data, nextPage)
+                    is Resource.Error -> handleNextPageError(result.type)
+                }
+            }
+        }
+    }
+
     private fun isQueryStillActual(query: String): Boolean = query == _state.value.query
 
     private fun handleResult(result: Resource<VacanciesPage>, page: Int) {
@@ -95,43 +136,38 @@ class SearchViewModel(
     }
 
     private fun handleSuccess(pageData: VacanciesPage, page: Int) {
-        val newHasMore = computeHasMore(pageData, page)
+        currentPage = page
+        maxPages = pageData.pages
+
         val uiItems = pageData.items.map(::toUiItem)
-        updateContentState(pageData, page, uiItems, newHasMore)
-    }
+        val newHasMore = computeHasMore(pageData, page)
 
-    private fun computeHasMore(pageData: VacanciesPage, page: Int): Boolean =
-        pageData.page < pageData.pages &&
-            !(pageData.items.isEmpty() && page > FIRST_PAGE)
-
-    private fun updateContentState(
-        pageData: VacanciesPage,
-        page: Int,
-        uiItems: List<VacancyShortItem>,
-        newHasMore: Boolean,
-    ) {
         _state.update { state ->
-            val result = state.result
-            val newResult = if (result is SearchResultState.Content) {
-                result.copy(
-                    vacancies = mergeItems(result.vacancies, uiItems, page),
+            val content = state.result as? SearchResultState.Content
+            val newResult = if (page == FIRST_PAGE || content == null) {
+                createInitialContent(uiItems, pageData.found, newHasMore)
+            } else {
+                content.copy(
+                    vacancies = (content.vacancies + uiItems).distinctBy { it.vacancy.id },
                     found = pageData.found,
                     isNextPageLoading = false,
                     hasMore = newHasMore,
                 )
-            } else {
-                createInitialContent(uiItems, pageData.found, newHasMore)
             }
             state.copy(result = newResult)
         }
     }
 
-    private fun mergeItems(
-        existing: List<VacancyShortItem>,
-        new: List<VacancyShortItem>,
-        page: Int,
-    ): List<VacancyShortItem> =
-        if (page == FIRST_PAGE) new else existing + new
+    private fun handleNextPageError(error: ErrorType) {
+        // Снимаем индикатор, currentPage/maxPages не трогаем — при следующем доскролле
+        // та же страница будет запрошена снова. Список остаётся на экране.
+        setNextPageLoading(false)
+        _paginationError.tryEmit(error)
+    }
+
+    private fun computeHasMore(pageData: VacanciesPage, page: Int): Boolean =
+        pageData.page < pageData.pages &&
+            !(pageData.items.isEmpty() && page > FIRST_PAGE)
 
     private fun createInitialContent(
         uiItems: List<VacancyShortItem>,
@@ -161,6 +197,22 @@ class SearchViewModel(
         }
     }
 
+    private fun setNextPageLoading(loading: Boolean) {
+        _state.update { state ->
+            val content = state.result as? SearchResultState.Content
+            if (content == null) {
+                state
+            } else {
+                state.copy(result = content.copy(isNextPageLoading = loading))
+            }
+        }
+    }
+
+    private fun resetPagination() {
+        currentPage = FIRST_PAGE
+        maxPages = DEFAULT_MAX_PAGES
+    }
+
     private fun cancelAllJobs() {
         searchJob?.cancel()
     }
@@ -180,5 +232,6 @@ class SearchViewModel(
     private companion object {
         const val SEARCH_DEBOUNCE_DELAY = 2_000L
         const val FIRST_PAGE = 1
+        const val DEFAULT_MAX_PAGES = 1
     }
 }
