@@ -3,13 +3,19 @@ package ru.practicum.android.diploma.search.presentation.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
@@ -40,6 +46,7 @@ fun SearchScreen(
     onQueryChange: (String) -> Unit,
     onClearClick: () -> Unit,
     onSearch: () -> Unit,
+    onLastItemReached: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -106,7 +113,9 @@ fun SearchScreen(
 
                     SearchVacanciesList(
                         vacancies = result.vacancies,
+                        isNextPageLoading = result.isNextPageLoading,
                         onVacancyClick = onVacancyClick,
+                        onLastItemReached = onLastItemReached,
                         modifier = Modifier.weight(1f),
                     )
                 }
@@ -164,13 +173,34 @@ private fun ErrorContent(
 @Composable
 private fun SearchVacanciesList(
     vacancies: List<VacancyShortItem>,
+    isNextPageLoading: Boolean,
     onVacancyClick: (String) -> Unit,
+    onLastItemReached: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val listState = rememberLazyListState()
+    // true, когда последний видимый элемент — последний в списке (включая лоадер).
+    val isLastItemVisible by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val lastVisibleIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index
+            val totalItemsCount = layoutInfo.totalItemsCount
+            lastVisibleIndex != null && totalItemsCount > 0 && lastVisibleIndex >= totalItemsCount - 1
+        }
+    }
+
+    LaunchedEffect(isLastItemVisible) {
+        if (isLastItemVisible) {
+            onLastItemReached()
+        }
+    }
+
     LazyColumn(
+        state = listState,
         modifier = modifier
             .fillMaxWidth()
             .padding(top = Dimens.spacing8),
+        contentPadding = PaddingValues(bottom = Dimens.spacing8),
     ) {
         items(
             items = vacancies,
@@ -186,6 +216,18 @@ private fun SearchVacanciesList(
                     onVacancyClick(item.vacancy.id)
                 },
             )
+        }
+        if (isNextPageLoading) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = Dimens.spacing16),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    AppLoader()
+                }
+            }
         }
     }
 }
@@ -243,6 +285,7 @@ private fun SearchScreenPreview(
             onQueryChange = {},
             onClearClick = {},
             onSearch = {},
+            onLastItemReached = {}
         )
     }
 }
