@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.core.common.format.SalaryFormatter
+import ru.practicum.android.diploma.core.domain.interactor.FavoritesInteractor
 import ru.practicum.android.diploma.core.domain.model.VacancyShort
-import ru.practicum.android.diploma.favorites.domain.interactor.FavoritesInteractor
 import ru.practicum.android.diploma.favorites.presentation.state.FavoriteVacancyItem
 import ru.practicum.android.diploma.favorites.presentation.state.FavoritesState
 
