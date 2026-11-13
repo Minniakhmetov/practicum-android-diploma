@@ -110,8 +110,33 @@ fun SearchScreen(
                         modifier = Modifier.weight(1f),
                     )
                 }
+
+                SearchResultState.Empty -> {
+                    EmptyContent()
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun EmptyContent() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = Dimens.screenHorizontalPadding),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        AppChip(
+            text = stringResource(R.string.search_no_vacancies),
+            modifier = Modifier.padding(top = Dimens.spacing4),
+        )
+
+        Placeholder(
+            image = R.drawable.img_empty_list_328x223,
+            text = stringResource(R.string.failed_to_get_vacancies),
+            modifier = Modifier.weight(1f),
+        )
     }
 }
 
@@ -120,29 +145,8 @@ private fun ErrorContent(
     type: ErrorType,
 ) {
     when (type) {
-        ErrorType.NotFound -> Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = Dimens.screenHorizontalPadding),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            AppChip(
-                text = stringResource(R.string.search_no_vacancies),
-                modifier = Modifier.padding(top = Dimens.spacing4),
-            )
-
-            Box(
-                modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.Center,
-            ) {
-                Placeholder(
-                    image = R.drawable.img_empty_list_328x223,
-                    text = stringResource(R.string.failed_to_get_vacancies),
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
-        }
-
+        // Ошибка ErrorType.NotFound используется для ответа сервера - 404 при запросе деталей вакансии
+        ErrorType.NotFound -> Unit
         ErrorType.NoInternet -> Placeholder(
             image = R.drawable.img_no_internet_328x223,
             text = stringResource(R.string.no_internet),
@@ -193,7 +197,7 @@ private class SearchStatePreviewProvider : PreviewParameterProvider<SearchState>
             result = SearchResultState.Initial,
         ),
         SearchState(
-            query = "Разоаботчик",
+            query = "Разработчик",
             result = SearchResultState.Loading,
         ),
         SearchState(
