@@ -1,4 +1,4 @@
-package ru.practicum.android.diploma.filter.domain.interactor
+package ru.practicum.android.diploma.core.domain.interactor
 
 import kotlinx.coroutines.flow.Flow
 import ru.practicum.android.diploma.core.common.result.Resource

@@ -12,8 +12,8 @@ import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.core.common.format.SalaryFormatter
 import ru.practicum.android.diploma.core.common.result.ErrorType
 import ru.practicum.android.diploma.core.common.result.Resource
+import ru.practicum.android.diploma.core.domain.interactor.FavoritesInteractor
 import ru.practicum.android.diploma.core.domain.model.VacancyDetails
-import ru.practicum.android.diploma.favorites.domain.interactor.FavoritesInteractor
 import ru.practicum.android.diploma.vacancy.domain.interactor.VacancyInteractor
 import ru.practicum.android.diploma.vacancy.presentation.state.VacancyState
 
