@@ -2,4 +2,6 @@
     <string name="team_title">Над приложением работали</string>
     <string name="team_member_aleksandra">Александра Задирака</string>
     <string name="team_member_florid">Флорид Минниахметов</string>
+    <!-- Подпись действия для TalkBack при нажатии на имя участника -->
+    <string name="team_open_github">Открыть GitHub</string>
 </resources>
