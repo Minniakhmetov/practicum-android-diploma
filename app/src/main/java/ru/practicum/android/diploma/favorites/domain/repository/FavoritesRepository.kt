@@ -8,7 +8,8 @@ interface FavoritesRepository {
     // Новые сверху. Flow из БД: список обновляется сразу после добавления или удаления
     fun getFavorites(): Flow<List<VacancyShort>>
     suspend fun getFavoriteVacancy(vacancyId: String): VacancyDetails?
-    suspend fun addToFavorites(vacancy: VacancyDetails)
+    // Добавить, если вакансии нет в избранном, иначе удалить
+    suspend fun toggleFavorite(vacancy: VacancyDetails)
     suspend fun removeFromFavorites(vacancyId: String)
     fun isFavorite(vacancyId: String): Flow<Boolean>
 }
