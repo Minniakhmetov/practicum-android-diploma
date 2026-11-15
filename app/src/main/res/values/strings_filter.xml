@@ -5,6 +5,7 @@
     <string name="filter_industry">Отрасль</string>
     <string name="filter_salary">Ожидаемая зарплата</string>
     <string name="filter_salary_hint">Введите сумму</string>
+    <string name="filter_salary_clear">Очистить поле</string>
     <string name="filter_only_with_salary">Не показывать без зарплаты</string>
 
     <!-- Выбор места работы -->
