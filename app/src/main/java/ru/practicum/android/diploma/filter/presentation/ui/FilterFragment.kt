@@ -5,19 +5,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.fragment.findNavController
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.practicum.android.diploma.core.common.navigation.NavigationKeys
 import ru.practicum.android.diploma.core.designsystem.theme.DiplomaTheme
-import ru.practicum.android.diploma.filter.presentation.state.FilterState
+import ru.practicum.android.diploma.filter.presentation.viewmodel.FilterViewModel
 
 class FilterFragment : Fragment() {
+
+    private val viewModel: FilterViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,26 +28,22 @@ class FilterFragment : Fragment() {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent {
             DiplomaTheme {
-                // Временное состояние экрана до FilterViewModel (#90): значения живут, пока открыт экран
-                var salary by rememberSaveable { mutableStateOf("") }
-                var onlyWithSalary by rememberSaveable { mutableStateOf(false) }
+                val state by viewModel.state.collectAsStateWithLifecycle()
                 FilterScreen(
-                    state = FilterState(salary = salary, onlyWithSalary = onlyWithSalary),
+                    state = state,
                     onBackClick = ::navigateBack,
-                    onSalaryChange = { salary = it },
-                    onSalaryClearClick = { salary = "" },
-                    onOnlyWithSalaryChange = { onlyWithSalary = it },
+                    onSalaryChange = viewModel::onSalaryChange,
+                    onSalaryClearClick = viewModel::onSalaryClear,
+                    onOnlyWithSalaryChange = viewModel::onOnlyWithSalaryChange,
                     onApplyClick = ::applyFilter,
-                    onResetClick = {
-                        salary = ""
-                        onlyWithSalary = false
-                    },
+                    onResetClick = viewModel::onResetClick,
                 )
             }
         }
     }
 
-    // "Применить": флаг экрану поиска и возврат назад. "Назад" возвращает без флага
+    // "Применить": флаг экрану поиска и возврат назад. "Назад" возвращает без флага.
+    // Настройки к этому моменту уже сохранены ViewModel
     private fun applyFilter() {
         if (isScreenResumed()) {
             val navController = findNavController()
