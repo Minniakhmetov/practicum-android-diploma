@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 import ru.practicum.android.diploma.core.database.entity.FavoriteVacancyEntity
 import ru.practicum.android.diploma.core.database.entity.FavoriteVacancyShortDb
@@ -37,4 +38,19 @@ interface FavoriteVacancyDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM favorite_vacancies WHERE id = :id)")
     fun isFavorite(id: String): Flow<Boolean>
+
+    @Query("SELECT EXISTS(SELECT 1 FROM favorite_vacancies WHERE id = :id)")
+    suspend fun exists(id: String): Boolean
+
+    // Проверка и изменение в одной транзакции: решение принимается по актуальному состоянию БД,
+    // а не по значению на экране. Транзакции Room выполняются по очереди, поэтому быстрые
+    // повторные нажатия обрабатываются последовательно
+    @Transaction
+    suspend fun toggle(vacancy: FavoriteVacancyEntity) {
+        if (exists(vacancy.id)) {
+            deleteById(vacancy.id)
+        } else {
+            insert(vacancy)
+        }
+    }
 }
