@@ -41,7 +41,8 @@ class SearchFragment : Fragment() {
                     onSearch = { viewModel.onSearchClicked() },
                     onQueryChange = { viewModel.onQueryChanged(it) },
                     onClearClick = { viewModel.onQueryChanged("") },
-                    onLastItemReached = { viewModel.onLastItemReached() }
+                    onLastItemReached = { viewModel.onLastItemReached() },
+                    onFilterClick = ::openFilter
                 )
             }
         }
@@ -90,6 +91,13 @@ class SearchFragment : Fragment() {
     private fun openVacancy(vacancyId: String) {
         findNavController().navigateSafely(
             SearchFragmentDirections.actionSearchFragmentToVacancyFragment(vacancyId = vacancyId),
+        )
+    }
+
+    private fun openFilter() {
+        if (!viewLifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return
+        findNavController().navigateSafely(
+            SearchFragmentDirections.actionSearchFragmentToFilterFragment(),
         )
     }
 }

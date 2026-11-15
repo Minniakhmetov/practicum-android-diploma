@@ -47,6 +47,7 @@ fun SearchScreen(
     onClearClick: () -> Unit,
     onSearch: () -> Unit,
     onLastItemReached: () -> Unit,
+    onFilterClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -60,7 +61,11 @@ fun SearchScreen(
             onBackClick = null,
             backContentDescription = null,
         ) {
-            AppIconButton(iconRes = R.drawable.ic_filter_off_24, contentDescription = null, onClick = {})
+            AppIconButton(
+                iconRes = R.drawable.ic_filter_off_24,
+                contentDescription = stringResource(R.string.filter_title),
+                onClick = onFilterClick
+            )
         }
 
         SearchField(
@@ -285,7 +290,8 @@ private fun SearchScreenPreview(
             onQueryChange = {},
             onClearClick = {},
             onSearch = {},
-            onLastItemReached = {}
+            onLastItemReached = {},
+            onFilterClick = {}
         )
     }
 }
