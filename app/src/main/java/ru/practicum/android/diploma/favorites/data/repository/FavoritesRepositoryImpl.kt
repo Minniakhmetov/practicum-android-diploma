@@ -20,8 +20,8 @@ class FavoritesRepositoryImpl(
     override suspend fun getFavoriteVacancy(vacancyId: String): VacancyDetails? =
         dao.getById(vacancyId)?.toDomain()
 
-    override suspend fun addToFavorites(vacancy: VacancyDetails) {
-        dao.insert(vacancy.toEntity())
+    override suspend fun toggleFavorite(vacancy: VacancyDetails) {
+        dao.toggle(vacancy.toEntity())
     }
 
     override suspend fun removeFromFavorites(vacancyId: String) {

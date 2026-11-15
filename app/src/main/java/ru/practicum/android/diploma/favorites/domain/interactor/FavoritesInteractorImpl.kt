@@ -16,8 +16,8 @@ class FavoritesInteractorImpl(
     override suspend fun getFavoriteVacancy(vacancyId: String): VacancyDetails? =
         repository.getFavoriteVacancy(vacancyId)
 
-    override suspend fun addToFavorites(vacancy: VacancyDetails) {
-        repository.addToFavorites(vacancy)
+    override suspend fun toggleFavorite(vacancy: VacancyDetails) {
+        repository.toggleFavorite(vacancy)
     }
 
     override suspend fun removeFromFavorites(vacancyId: String) {
