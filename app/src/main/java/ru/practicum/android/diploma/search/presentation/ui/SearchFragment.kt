@@ -42,7 +42,7 @@ class SearchFragment : Fragment() {
                     onQueryChange = { viewModel.onQueryChanged(it) },
                     onClearClick = { viewModel.onQueryChanged("") },
                     onLastItemReached = { viewModel.onLastItemReached() },
-                    onClickFilter = ::openFilter
+                    onFilterClick = ::openFilter
                 )
             }
         }
