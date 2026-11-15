@@ -26,8 +26,9 @@ import ru.practicum.android.diploma.core.designsystem.theme.Dimens
 import ru.practicum.android.diploma.core.designsystem.theme.DiplomaTheme
 import ru.practicum.android.diploma.core.designsystem.theme.White
 
-// Логотип шире высоты больше чем в 1.5 раза считаем текстовым
-private const val WORDMARK_ASPECT_RATIO = 1.5f
+// Логотип с соотношением сторон в этих пределах считаем квадратным
+private const val SQUARE_MIN_ASPECT_RATIO = 0.9f
+private const val SQUARE_MAX_ASPECT_RATIO = 1.1f
 
 // Логотип работодателя 48x48: скругление 12, рамка 1 цвета Light Gray (в обеих темах).
 // Пока логотип грузится, при ошибке и если ссылки нет - плейсхолдер 32 по центру (отступ 8).
@@ -66,8 +67,9 @@ fun CompanyLogo(
 }
 
 // Квадратный логотип занимает всю рамку, как в макете.
-// Широкий текстовый ("Яндекс Маркет", "auto.ru") вписывается целиком с отступом,
-// иначе буквы упираются в рамку и срезаются скруглением.
+// Остальные вписываются целиком с отступом: и широкие текстовые ("Яндекс Маркет", "IBM"),
+// и неквадратные значки (птичка Twitter, яблоко Apple). Иначе Crop срезает края,
+// а без отступа края упираются в рамку и срезаются скруглением.
 @Composable
 private fun LogoImage(
     logoUrl: String,
@@ -76,7 +78,7 @@ private fun LogoImage(
 ) {
     // Меняется только при успешной загрузке: смена contentScale перезапускает запрос,
     // и сброс флага в состоянии Loading привёл бы к бесконечному переключению
-    var isWordmark by remember(logoUrl) { mutableStateOf(false) }
+    var isSquare by remember(logoUrl) { mutableStateOf(true) }
 
     AsyncImage(
         model = logoUrl,
@@ -87,13 +89,14 @@ private fun LogoImage(
         modifier = Modifier
             .fillMaxSize()
             .then(if (isLoaded) Modifier.background(White) else Modifier)
-            .then(if (isWordmark) Modifier.padding(Dimens.spacing4) else Modifier),
-        contentScale = if (isWordmark) ContentScale.Fit else ContentScale.Crop,
+            .then(if (isSquare) Modifier else Modifier.padding(Dimens.spacing4)),
+        contentScale = if (isSquare) ContentScale.Crop else ContentScale.Fit,
         onState = { state ->
             val success = state as? AsyncImagePainter.State.Success
             if (success != null) {
                 val image = success.result.image
-                isWordmark = image.width > image.height * WORDMARK_ASPECT_RATIO
+                val aspectRatio = image.width.toFloat() / image.height
+                isSquare = aspectRatio in SQUARE_MIN_ASPECT_RATIO..SQUARE_MAX_ASPECT_RATIO
             }
             onLoadedChange(success != null)
         },

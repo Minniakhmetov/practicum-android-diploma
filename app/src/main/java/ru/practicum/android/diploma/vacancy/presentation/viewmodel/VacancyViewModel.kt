@@ -47,15 +47,13 @@ class VacancyViewModel(
         vacancyInteractor.shareVacancy(vacancy.shareUrl)
     }
 
-    // Добавить или удалить можно только загруженную вакансию: в БД сохраняется она целиком
+    // Добавить или удалить можно только загруженную вакансию: в БД сохраняется она целиком.
+    // Что сделать, решает БД в одной транзакции, а не isFavorite: при быстрых повторных нажатиях
+    // поток из Room может ещё не обновиться
     fun onFavoriteClick() {
         val vacancy = (_state.value as? VacancyState.Content)?.vacancy ?: return
         viewModelScope.launch {
-            if (isFavorite.value) {
-                favoritesInteractor.removeFromFavorites(vacancy.id)
-            } else {
-                favoritesInteractor.addToFavorites(vacancy)
-            }
+            favoritesInteractor.toggleFavorite(vacancy)
         }
     }
 
