@@ -31,7 +31,8 @@ val searchModule = module {
     viewModel {
         SearchViewModel(
             searchInteractor = get(),
-            salaryFormatter = get()
+            salaryFormatter = get(),
+            filterInteractor = get()
         )
     }
 }

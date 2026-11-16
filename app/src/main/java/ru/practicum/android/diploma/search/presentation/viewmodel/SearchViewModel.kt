@@ -16,6 +16,7 @@ import ru.practicum.android.diploma.core.common.format.SalaryFormatter
 import ru.practicum.android.diploma.core.common.result.ErrorType
 import ru.practicum.android.diploma.core.common.result.Resource
 import ru.practicum.android.diploma.core.common.util.Debounce
+import ru.practicum.android.diploma.core.domain.interactor.FilterInteractor
 import ru.practicum.android.diploma.core.domain.model.FilterSettings
 import ru.practicum.android.diploma.core.domain.model.VacancyShort
 import ru.practicum.android.diploma.search.domain.interactor.SearchInteractor
@@ -26,7 +27,8 @@ import ru.practicum.android.diploma.search.presentation.state.VacancyShortItem
 
 class SearchViewModel(
     private val searchInteractor: SearchInteractor,
-    private val salaryFormatter: SalaryFormatter
+    private val salaryFormatter: SalaryFormatter,
+    private val filterInteractor: FilterInteractor
 ) : ViewModel() {
     private val _state = MutableStateFlow(SearchState())
     val state: StateFlow<SearchState> = _state.asStateFlow()
@@ -40,6 +42,13 @@ class SearchViewModel(
     private var currentSettings: FilterSettings = FilterSettings()
     private var currentPage: Int = FIRST_PAGE
     private var maxPages: Int = DEFAULT_MAX_PAGES
+
+    init {
+        viewModelScope.launch {
+            filterInteractor.getFilterSettings()
+                .collect { currentSettings = it }
+        }
+    }
 
     private val searchDebounce = Debounce<String>(
         delayMillis = SEARCH_DEBOUNCE_DELAY,
@@ -88,7 +97,8 @@ class SearchViewModel(
             query.isNotBlank()
 
         if (canLoadNextPage) {
-            loadNextPage(query, currentSettings)
+            val appliedSettings = filterInteractor.getAppliedSettings()
+            loadNextPage(query, appliedSettings)
         }
     }
 
@@ -109,6 +119,7 @@ class SearchViewModel(
                 handleResult(result, page)
             }
         }
+        filterInteractor.setAppliedSettings(settings)
     }
 
     // Загрузка следующей страницы: список не сбрасываем, показываем индикатор внизу
