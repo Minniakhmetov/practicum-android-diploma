@@ -37,8 +37,6 @@ class SearchViewModel(
     private val _paginationError = MutableSharedFlow<ErrorType>(extraBufferCapacity = 1)
     val paginationError: SharedFlow<ErrorType> = _paginationError.asSharedFlow()
     private var searchJob: Job? = null
-
-    // Фильтр будет реализовать в Epic_4
     private var currentSettings: FilterSettings = FilterSettings()
     private var currentPage: Int = FIRST_PAGE
     private var maxPages: Int = DEFAULT_MAX_PAGES
@@ -46,7 +44,10 @@ class SearchViewModel(
     init {
         viewModelScope.launch {
             filterInteractor.getFilterSettings()
-                .collect { currentSettings = it }
+                .collect { settings ->
+                    currentSettings = settings
+                    _state.update { it.copy(isFilterEmpty = settings.isEmpty) }
+                }
         }
     }
 
