@@ -6,6 +6,7 @@ import ru.practicum.android.diploma.core.domain.model.VacancyShort
 data class SearchState(
     val query: String = "",
     val result: SearchResultState = SearchResultState.Initial,
+    val isFilterEmpty: Boolean = true
 )
 
 sealed interface SearchResultState {
