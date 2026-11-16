@@ -23,13 +23,16 @@ class FilterViewModel(
     // Сохранённые настройки целиком: при записи не теряем параметры, которых нет на экране
     private var settings = FilterSettings()
 
+    // Настройки, с которыми получена текущая выдача поиска: с ними сравниваем, чтобы показать "Применить"
+    private var appliedSettings = FilterSettings()
+
     init {
         loadSettings()
     }
 
     fun onSalaryChange(salary: String) {
-        _state.value = _state.value.copy(salary = salary)
         saveSettings(settings.copy(salary = salary.toIntOrNull()))
+        _state.value = _state.value.copy(salary = salary, isChanged = isChanged())
     }
 
     fun onSalaryClear() {
@@ -37,13 +40,13 @@ class FilterViewModel(
     }
 
     fun onOnlyWithSalaryChange(onlyWithSalary: Boolean) {
-        _state.value = _state.value.copy(onlyWithSalary = onlyWithSalary)
         saveSettings(settings.copy(onlyWithSalary = onlyWithSalary))
+        _state.value = _state.value.copy(onlyWithSalary = onlyWithSalary, isChanged = isChanged())
     }
 
     fun onResetClick() {
         settings = FilterSettings()
-        _state.value = FilterState()
+        _state.value = FilterState(isChanged = isChanged())
         viewModelScope.launch {
             filterInteractor.clearFilterSettings()
         }
@@ -55,12 +58,16 @@ class FilterViewModel(
     private fun loadSettings() {
         viewModelScope.launch {
             settings = filterInteractor.getFilterSettings().first()
+            appliedSettings = filterInteractor.getAppliedSettings()
             _state.value = FilterState(
                 salary = settings.salary?.toString().orEmpty(),
                 onlyWithSalary = settings.onlyWithSalary,
+                isChanged = isChanged(),
             )
         }
     }
+
+    private fun isChanged(): Boolean = settings != appliedSettings
 
     private fun saveSettings(newSettings: FilterSettings) {
         settings = newSettings
