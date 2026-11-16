@@ -68,7 +68,7 @@ fun SearchScreen(
                 } else {
                     R.drawable.ic_filter_on_24
                 },
-                tint = Color.Unspecified,
+                tint = if (state.isFilterEmpty) DiplomaTheme.colors.primaryText else Color.Unspecified,
                 contentDescription = stringResource(R.string.filter_title),
                 onClick = onFilterClick
             )
