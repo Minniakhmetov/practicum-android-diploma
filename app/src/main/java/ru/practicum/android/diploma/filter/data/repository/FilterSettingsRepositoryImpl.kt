@@ -12,6 +12,10 @@ class FilterSettingsRepositoryImpl(
 ) : FilterSettingsRepository {
     private val state = MutableStateFlow(filterStorage.read())
 
+    // Настройки текущей выдачи поиска. Только в памяти: репозиторий - single и живёт, пока жив процесс,
+    // а после перезапуска процесса выдачи на экране поиска тоже нет
+    private var appliedSettings = FilterSettings()
+
     override fun getFilterSettings(): Flow<FilterSettings> =
         state.asStateFlow()
 
@@ -23,5 +27,11 @@ class FilterSettingsRepositoryImpl(
     override suspend fun clearFilterSettings() {
         filterStorage.clear()
         state.value = FilterSettings()
+    }
+
+    override fun getAppliedSettings(): FilterSettings = appliedSettings
+
+    override fun setAppliedSettings(settings: FilterSettings) {
+        appliedSettings = settings
     }
 }

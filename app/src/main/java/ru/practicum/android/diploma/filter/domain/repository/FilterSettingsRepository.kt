@@ -7,4 +7,6 @@ interface FilterSettingsRepository {
     fun getFilterSettings(): Flow<FilterSettings>
     suspend fun saveFilterSettings(settings: FilterSettings)
     suspend fun clearFilterSettings()
+    fun getAppliedSettings(): FilterSettings
+    fun setAppliedSettings(settings: FilterSettings)
 }

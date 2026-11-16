@@ -23,8 +23,8 @@ class FilterViewModel(
     // Сохранённые настройки целиком: при записи не теряем параметры, которых нет на экране
     private var settings = FilterSettings()
 
-    // Настройки при входе на экран: с ними сравниваем, изменился ли фильтр
-    private var initialSettings = FilterSettings()
+    // Настройки, с которыми получена текущая выдача поиска: с ними сравниваем, чтобы показать "Применить"
+    private var appliedSettings = FilterSettings()
 
     init {
         loadSettings()
@@ -58,15 +58,16 @@ class FilterViewModel(
     private fun loadSettings() {
         viewModelScope.launch {
             settings = filterInteractor.getFilterSettings().first()
-            initialSettings = settings
+            appliedSettings = filterInteractor.getAppliedSettings()
             _state.value = FilterState(
                 salary = settings.salary?.toString().orEmpty(),
                 onlyWithSalary = settings.onlyWithSalary,
+                isChanged = isChanged(),
             )
         }
     }
 
-    private fun isChanged(): Boolean = settings != initialSettings
+    private fun isChanged(): Boolean = settings != appliedSettings
 
     private fun saveSettings(newSettings: FilterSettings) {
         settings = newSettings
