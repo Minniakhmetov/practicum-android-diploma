@@ -27,4 +27,10 @@ class FilterInteractorImpl(
 
     override suspend fun clearFilterSettings() =
         filterRepository.clearFilterSettings()
+
+    override fun getAppliedSettings(): FilterSettings =
+        filterRepository.getAppliedSettings()
+
+    override fun setAppliedSettings(settings: FilterSettings) =
+        filterRepository.setAppliedSettings(settings)
 }

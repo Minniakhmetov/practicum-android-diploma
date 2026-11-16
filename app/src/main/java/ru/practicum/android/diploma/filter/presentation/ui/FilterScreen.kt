@@ -73,18 +73,25 @@ fun FilterScreen(
                 onCheckedChange = onOnlyWithSalaryChange,
             )
         }
-        if (state.isActionsVisible) {
-            FilterActions(onApplyClick = onApplyClick, onResetClick = onResetClick)
-        }
+        FilterActions(
+            isApplyVisible = state.isApplyVisible,
+            isResetVisible = state.isResetVisible,
+            onApplyClick = onApplyClick,
+            onResetClick = onResetClick,
+        )
     }
 }
 
-// "Применить" и "Сбросить" друг под другом на всю ширину
+// "Применить" и "Сбросить" друг под другом на всю ширину. После очистки фильтра
+// видна только "Применить": чтобы перезапустить поиск без фильтра
 @Composable
 private fun FilterActions(
+    isApplyVisible: Boolean,
+    isResetVisible: Boolean,
     onApplyClick: () -> Unit,
     onResetClick: () -> Unit,
 ) {
+    if (!isApplyVisible && !isResetVisible) return
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -95,16 +102,20 @@ private fun FilterActions(
             ),
         verticalArrangement = Arrangement.spacedBy(Dimens.spacing8),
     ) {
-        PrimaryButton(
-            text = stringResource(R.string.filter_apply),
-            onClick = onApplyClick,
-            modifier = Modifier.fillMaxWidth(),
-        )
-        TertiaryButton(
-            text = stringResource(R.string.filter_reset),
-            onClick = onResetClick,
-            modifier = Modifier.fillMaxWidth(),
-        )
+        if (isApplyVisible) {
+            PrimaryButton(
+                text = stringResource(R.string.filter_apply),
+                onClick = onApplyClick,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        if (isResetVisible) {
+            TertiaryButton(
+                text = stringResource(R.string.filter_reset),
+                onClick = onResetClick,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
     }
 }
 
@@ -112,6 +123,7 @@ private class FilterStatePreviewProvider : PreviewParameterProvider<FilterState>
     override val values = sequenceOf(
         FilterState(),
         FilterState(salary = "40000", onlyWithSalary = true),
+        FilterState(isChanged = true),
     )
 }
 
