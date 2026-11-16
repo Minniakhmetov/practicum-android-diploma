@@ -97,7 +97,8 @@ class SearchViewModel(
             query.isNotBlank()
 
         if (canLoadNextPage) {
-            loadNextPage(query, currentSettings)
+            val appliedSettings = filterInteractor.getAppliedSettings()
+            loadNextPage(query, appliedSettings)
         }
     }
 
@@ -118,6 +119,7 @@ class SearchViewModel(
                 handleResult(result, page)
             }
         }
+        filterInteractor.setAppliedSettings(settings)
     }
 
     // Загрузка следующей страницы: список не сбрасываем, показываем индикатор внизу
