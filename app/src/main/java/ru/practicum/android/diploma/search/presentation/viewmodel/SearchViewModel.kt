@@ -43,6 +43,11 @@ class SearchViewModel(
 
     init {
         viewModelScope.launch {
+            // 1. Дожидаемся, пока SharedPreferences прочитается в IO.
+            //    До этого state/currentSettings содержат дефолтные настройки.
+            filterInteractor.awaitFilterSettingsLoaded()
+
+            // 2. Подписываемся на поток — первая эмиссия уже с реальными данными.
             filterInteractor.getFilterSettings()
                 .collect { settings ->
                     currentSettings = settings

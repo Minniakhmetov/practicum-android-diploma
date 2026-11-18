@@ -33,4 +33,8 @@ class FilterInteractorImpl(
 
     override fun setAppliedSettings(settings: FilterSettings) =
         filterRepository.setAppliedSettings(settings)
+
+    override suspend fun awaitFilterSettingsLoaded() {
+        filterRepository.awaitLoaded()
+    }
 }
