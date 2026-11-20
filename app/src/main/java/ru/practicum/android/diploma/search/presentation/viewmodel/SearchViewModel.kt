@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.practicum.android.diploma.R
@@ -37,7 +38,6 @@ class SearchViewModel(
     private val _paginationError = MutableSharedFlow<ErrorType>(extraBufferCapacity = 1)
     val paginationError: SharedFlow<ErrorType> = _paginationError.asSharedFlow()
     private var searchJob: Job? = null
-    private var currentSettings: FilterSettings = FilterSettings()
     private var currentPage: Int = FIRST_PAGE
     private var maxPages: Int = DEFAULT_MAX_PAGES
 
@@ -50,7 +50,6 @@ class SearchViewModel(
             // 2. Подписываемся на поток — первая эмиссия уже с реальными данными.
             filterInteractor.getFilterSettings()
                 .collect { settings ->
-                    currentSettings = settings
                     _state.update { it.copy(isFilterEmpty = settings.isEmpty) }
                 }
         }
@@ -60,7 +59,7 @@ class SearchViewModel(
         delayMillis = SEARCH_DEBOUNCE_DELAY,
         scope = viewModelScope
     ) { query ->
-        performSearch(query, currentSettings, FIRST_PAGE)
+        performSearch(query, FIRST_PAGE)
     }
 
     // Ввод текста
@@ -113,19 +112,21 @@ class SearchViewModel(
         searchDebounce.cancel()
         cancelAllJobs()
         resetPagination()
-        performSearch(query, currentSettings, FIRST_PAGE)
+        performSearch(query, FIRST_PAGE)
     }
 
-    private fun performSearch(query: String, settings: FilterSettings, page: Int) {
+    private fun performSearch(query: String, page: Int) {
         cancelAllJobs()
         setFirstPageLoading()
         searchJob = viewModelScope.launch {
-            val result = searchInteractor.searchVacancies(query, settings, page)
+            filterInteractor.awaitFilterSettingsLoaded()
+            val actualSettings = filterInteractor.getFilterSettings().first()
+            filterInteractor.setAppliedSettings(actualSettings)
+            val result = searchInteractor.searchVacancies(query, actualSettings, page)
             if (isQueryStillActual(query)) {
                 handleResult(result, page)
             }
         }
-        filterInteractor.setAppliedSettings(settings)
     }
 
     // Загрузка следующей страницы: список не сбрасываем, показываем индикатор внизу
