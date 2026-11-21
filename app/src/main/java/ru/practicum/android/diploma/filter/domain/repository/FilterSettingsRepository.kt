@@ -9,4 +9,5 @@ interface FilterSettingsRepository {
     suspend fun clearFilterSettings()
     fun getAppliedSettings(): FilterSettings
     fun setAppliedSettings(settings: FilterSettings)
+    suspend fun awaitLoaded()
 }

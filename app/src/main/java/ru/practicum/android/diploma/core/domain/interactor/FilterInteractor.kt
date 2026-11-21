@@ -17,4 +17,8 @@ interface FilterInteractor {
     // поиск сообщает их при запуске, фильтр сравнивает с ними, чтобы показать "Применить"
     fun getAppliedSettings(): FilterSettings
     fun setAppliedSettings(settings: FilterSettings)
+
+    // Приостанавливает вызывающего, пока начальные настройки фильтра
+    // не прочитаны из хранилища. Первый поиск должен дождаться этого.
+    suspend fun awaitFilterSettingsLoaded()
 }

@@ -57,6 +57,9 @@ class FilterViewModel(
     // введённые ведущие нули ("007" -> "7")
     private fun loadSettings() {
         viewModelScope.launch {
+            // Дожидаемся, пока SharedPreferences прочитается в IO.
+            // Без этого first() ниже может вернуть дефолтный FilterSettings().
+            filterInteractor.awaitFilterSettingsLoaded()
             settings = filterInteractor.getFilterSettings().first()
             appliedSettings = filterInteractor.getAppliedSettings()
             _state.value = FilterState(
