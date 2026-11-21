@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,14 +22,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import ru.practicum.android.diploma.R
 import ru.practicum.android.diploma.core.designsystem.theme.Dimens
 import ru.practicum.android.diploma.core.designsystem.theme.DiplomaTheme
 
+// Зарплата хранится в Int: 9 цифр (до 999 999 999) помещаются без переполнения
+private const val MAX_SALARY_LENGTH = 9
+
 // Поле ввода зарплаты с подписью сверху ("Ожидаемая зарплата"), открывает цифровую клавиатуру.
-// Подпись: в фокусе синяя, с текстом - чёрная, пустая - серая. Крестик виден в фокусе, когда есть текст.
+// Принимает только цифры: остальные символы (запятая, точка, минус, пробел) отбрасываются,
+// в том числе при вставке. Разряды и ведущие нули не обрабатываются (ответы к ТЗ).
+// Подпись: в фокусе синяя, с текстом - чёрная, пустая - серая. Крестик виден, когда есть текст.
 @Composable
 fun SalaryTextField(
     value: String,
@@ -42,6 +50,7 @@ fun SalaryTextField(
     val colors = DiplomaTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
+    val focusManager = LocalFocusManager.current
     val labelColor = when {
         isFocused -> colors.accent
         value.isNotEmpty() -> colors.fieldText
@@ -50,12 +59,17 @@ fun SalaryTextField(
 
     BasicTextField(
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = { newValue ->
+            val digits = newValue.filter { it in '0'..'9' }.take(MAX_SALARY_LENGTH)
+            if (digits != value) onValueChange(digits)
+        },
         modifier = modifier
             .fillMaxWidth()
             .height(Dimens.textFieldHeight),
         textStyle = MaterialTheme.typography.bodyLarge.copy(color = colors.fieldText),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        // "Готово" на клавиатуре закрывает её и снимает фокус с поля
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
         singleLine = true,
         interactionSource = interactionSource,
         cursorBrush = SolidColor(colors.accent),
@@ -88,7 +102,7 @@ fun SalaryTextField(
                         innerTextField()
                     }
                 }
-                if (isFocused && value.isNotEmpty()) {
+                if (value.isNotEmpty()) {
                     AppIconButton(
                         iconRes = R.drawable.ic_close_24,
                         contentDescription = clearContentDescription,

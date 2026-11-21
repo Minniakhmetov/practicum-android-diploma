@@ -18,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -47,6 +48,7 @@ fun SearchScreen(
     onClearClick: () -> Unit,
     onSearch: () -> Unit,
     onLastItemReached: () -> Unit,
+    onFilterClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -60,7 +62,16 @@ fun SearchScreen(
             onBackClick = null,
             backContentDescription = null,
         ) {
-            AppIconButton(iconRes = R.drawable.ic_filter_off_24, contentDescription = null, onClick = {})
+            AppIconButton(
+                iconRes = if (state.isFilterEmpty) {
+                    R.drawable.ic_filter_off_24
+                } else {
+                    R.drawable.ic_filter_on_24
+                },
+                tint = if (state.isFilterEmpty) DiplomaTheme.colors.primaryText else Color.Unspecified,
+                contentDescription = stringResource(R.string.filter_title),
+                onClick = onFilterClick
+            )
         }
 
         SearchField(
@@ -237,10 +248,12 @@ private class SearchStatePreviewProvider : PreviewParameterProvider<SearchState>
         SearchState(
             query = "",
             result = SearchResultState.Initial,
+            isFilterEmpty = false
         ),
         SearchState(
             query = "Разработчик",
             result = SearchResultState.Loading,
+            isFilterEmpty = false
         ),
         SearchState(
             query = "Android-разработчик",
@@ -261,12 +274,14 @@ private class SearchStatePreviewProvider : PreviewParameterProvider<SearchState>
                 },
                 hasMore = false
             ),
+            isFilterEmpty = false
         ),
         SearchState(
             query = "Android",
             result = SearchResultState.Error(
                 type = ErrorType.NoInternet,
             ),
+            isFilterEmpty = false
         ),
     )
 }
@@ -285,7 +300,8 @@ private fun SearchScreenPreview(
             onQueryChange = {},
             onClearClick = {},
             onSearch = {},
-            onLastItemReached = {}
+            onLastItemReached = {},
+            onFilterClick = {}
         )
     }
 }

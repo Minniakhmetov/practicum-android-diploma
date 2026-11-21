@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.practicum.android.diploma.R
@@ -16,6 +17,7 @@ import ru.practicum.android.diploma.core.common.format.SalaryFormatter
 import ru.practicum.android.diploma.core.common.result.ErrorType
 import ru.practicum.android.diploma.core.common.result.Resource
 import ru.practicum.android.diploma.core.common.util.Debounce
+import ru.practicum.android.diploma.core.domain.interactor.FilterInteractor
 import ru.practicum.android.diploma.core.domain.model.FilterSettings
 import ru.practicum.android.diploma.core.domain.model.VacancyShort
 import ru.practicum.android.diploma.search.domain.interactor.SearchInteractor
@@ -26,7 +28,8 @@ import ru.practicum.android.diploma.search.presentation.state.VacancyShortItem
 
 class SearchViewModel(
     private val searchInteractor: SearchInteractor,
-    private val salaryFormatter: SalaryFormatter
+    private val salaryFormatter: SalaryFormatter,
+    private val filterInteractor: FilterInteractor
 ) : ViewModel() {
     private val _state = MutableStateFlow(SearchState())
     val state: StateFlow<SearchState> = _state.asStateFlow()
@@ -35,17 +38,28 @@ class SearchViewModel(
     private val _paginationError = MutableSharedFlow<ErrorType>(extraBufferCapacity = 1)
     val paginationError: SharedFlow<ErrorType> = _paginationError.asSharedFlow()
     private var searchJob: Job? = null
-
-    // Фильтр будет реализовать в Epic_4
-    private var currentSettings: FilterSettings = FilterSettings()
     private var currentPage: Int = FIRST_PAGE
     private var maxPages: Int = DEFAULT_MAX_PAGES
+
+    init {
+        viewModelScope.launch {
+            // 1. Дожидаемся, пока SharedPreferences прочитается в IO.
+            //    До этого state/currentSettings содержат дефолтные настройки.
+            filterInteractor.awaitFilterSettingsLoaded()
+
+            // 2. Подписываемся на поток — первая эмиссия уже с реальными данными.
+            filterInteractor.getFilterSettings()
+                .collect { settings ->
+                    _state.update { it.copy(isFilterEmpty = settings.isEmpty) }
+                }
+        }
+    }
 
     private val searchDebounce = Debounce<String>(
         delayMillis = SEARCH_DEBOUNCE_DELAY,
         scope = viewModelScope
     ) { query ->
-        performSearch(query, currentSettings, FIRST_PAGE)
+        performSearch(query, FIRST_PAGE)
     }
 
     // Ввод текста
@@ -88,7 +102,8 @@ class SearchViewModel(
             query.isNotBlank()
 
         if (canLoadNextPage) {
-            loadNextPage(query, currentSettings)
+            val appliedSettings = filterInteractor.getAppliedSettings()
+            loadNextPage(query, appliedSettings)
         }
     }
 
@@ -97,14 +112,17 @@ class SearchViewModel(
         searchDebounce.cancel()
         cancelAllJobs()
         resetPagination()
-        performSearch(query, currentSettings, FIRST_PAGE)
+        performSearch(query, FIRST_PAGE)
     }
 
-    private fun performSearch(query: String, settings: FilterSettings, page: Int) {
+    private fun performSearch(query: String, page: Int) {
         cancelAllJobs()
         setFirstPageLoading()
         searchJob = viewModelScope.launch {
-            val result = searchInteractor.searchVacancies(query, settings, page)
+            filterInteractor.awaitFilterSettingsLoaded()
+            val actualSettings = filterInteractor.getFilterSettings().first()
+            filterInteractor.setAppliedSettings(actualSettings)
+            val result = searchInteractor.searchVacancies(query, actualSettings, page)
             if (isQueryStillActual(query)) {
                 handleResult(result, page)
             }
