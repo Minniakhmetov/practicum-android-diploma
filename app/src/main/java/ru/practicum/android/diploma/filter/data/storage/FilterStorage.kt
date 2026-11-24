@@ -10,27 +10,11 @@ class FilterStorage(context: Context) {
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     fun read(): FilterSettings = FilterSettings(
-        cityId = readIntOrNull(KEY_CITY_ID),
-        industryId = readIntOrNull(KEY_INDUSTRY_ID),
-        salary = readIntOrNull(KEY_SALARY),
+        salary = if (prefs.contains(KEY_SALARY)) prefs.getInt(KEY_SALARY, 0) else null,
         onlyWithSalary = prefs.getBoolean(KEY_ONLY_WITH_SALARY, false)
     )
-
-    private fun readIntOrNull(key: String): Int? =
-        if (prefs.contains(key)) prefs.getInt(key, 0) else null
-
     fun write(settings: FilterSettings) {
         prefs.edit {
-            if (settings.cityId != null) {
-                putInt(KEY_CITY_ID, settings.cityId)
-            } else {
-                remove(KEY_CITY_ID)
-            }
-            if (settings.industryId != null) {
-                putInt(KEY_INDUSTRY_ID, settings.industryId)
-            } else {
-                remove(KEY_INDUSTRY_ID)
-            }
             if (settings.salary != null) {
                 putInt(KEY_SALARY, settings.salary)
             } else {
@@ -46,8 +30,6 @@ class FilterStorage(context: Context) {
 
     private companion object {
         const val PREFS_NAME = "filter_prefs"
-        const val KEY_CITY_ID = "city_id"
-        const val KEY_INDUSTRY_ID = "industry_id"
         const val KEY_SALARY = "salary"
         const val KEY_ONLY_WITH_SALARY = "only_with_salary"
     }

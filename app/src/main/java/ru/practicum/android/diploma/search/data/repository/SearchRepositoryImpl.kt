@@ -32,8 +32,6 @@ class SearchRepositoryImpl(
     ): Map<String, String> = buildMap {
         put(KEY_TEXT, text.trim())
         put(KEY_PAGE, page.toString())
-        settings.cityId?.let { put(KEY_AREA, it.toString()) }
-        settings.industryId?.let { put(KEY_INDUSTRY, it.toString()) }
         settings.salary?.let { put(KEY_SALARY, it.toString()) }
 
         // only_with_salary: добавляем только при true
@@ -46,8 +44,6 @@ class SearchRepositoryImpl(
     private companion object {
         const val KEY_TEXT = "text"
         const val KEY_PAGE = "page"
-        const val KEY_AREA = "area"
-        const val KEY_INDUSTRY = "industry"
         const val KEY_SALARY = "salary"
         const val KEY_ONLY_WITH_SALARY = "only_with_salary"
     }
